@@ -1,0 +1,1 @@
+dmesg | perl -ne '/(\d+-\d+:\d+.\d+)/ && print "$1\n"' | tail -n 1 > /sys/bus/usb/drivers/usbhid/unbind
