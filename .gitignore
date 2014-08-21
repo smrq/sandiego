@@ -1,0 +1,17 @@
+*.eep
+*.elf
+*.hex
+*.lss
+*.lst
+*.map
+*.o
+*.s
+*.sym
+firmware/*
+!firmware/Keyboard
+!firmware/LUFA-140302
+firmware/LUFA-140302/*
+!firmware/LUFA-140302/README.txt
+!firmware/LUFA-140302/LUFA
+!firmware/Arduino-keyboard-0.3.hex
+!firmware/Arduino-usbserial-uno.hex
