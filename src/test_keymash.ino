@@ -1,23 +1,23 @@
 #include "Arduino.h"
+#include "Keys.h"
 
-#define REPORT_SIZE 8
+#define REPORT_SIZE 24
 #define REPORT_BYTES (REPORT_SIZE-1)
 #define SERIAL_RATE 9600
+
+#define COLUMNS 10
+#define ROWS 7
 
 typedef struct {
 	uint8_t modifiers;
 	uint8_t keys[REPORT_BYTES];
 } report_keyboard_t;
 
-#define COLUMNS 10
-#define ROWS 7
 const int columnPins[COLUMNS] = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 const int rowPins[ROWS] = { 12, 14, 15, 16, 17, 18, 19 };
-
 const int ledPin = 13;
 
 report_keyboard_t report;
-bool isLedLit = false;
 
 void setup() {
 	for (int column = 0; column < COLUMNS; ++column) {
@@ -39,14 +39,17 @@ void setup() {
 }
 
 void loop() {
-	report.keys[1] ^= 0x48;
-	//toggleKeyBit(0x48);
+	static uint8_t bitToFlip = K_A_a;
+	static bool isLedLit = false;
+
+	report.modifiers ^= K_MODIFIER_LSHIFT;
+	toggleKeyBit(bitToFlip);
+
+	if (++bitToFlip > K_0_RPAREN)
+		bitToFlip = K_A_a;
+
 	Serial.write((const uint8_t*)&report, sizeof(report));
-
-	isLedLit = !isLedLit;
-	digitalWrite(ledPin, isLedLit ? HIGH : LOW);
-
-	delay(750);
+	delay(500);
 }
 
 void setKeyBit(uint8_t code) {

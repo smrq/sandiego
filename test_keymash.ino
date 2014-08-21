@@ -1,43 +1,55 @@
 #include "Arduino.h"
+#include "Keys.h"
 
-#define REPORT_SIZE  16
+#define REPORT_SIZE 24
 #define REPORT_BYTES (REPORT_SIZE-1)
+#define SERIAL_RATE 9600
+
+#define COLUMNS 10
+#define ROWS 7
 
 typedef struct {
 	uint8_t modifiers;
 	uint8_t keys[REPORT_BYTES];
 } report_keyboard_t;
 
-#define columnCount 10
-#define rowCount 7
-const int columnPins[columnCount] = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
-const int rowPins[rowCount] = { 12, 13, 14, 15, 16, 17, 18 };
+const int columnPins[COLUMNS] = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+const int rowPins[ROWS] = { 12, 14, 15, 16, 17, 18, 19 };
+const int ledPin = 13;
 
 report_keyboard_t report;
 
 void setup() {
-	for (int column = 0; column < columnCount; ++column) {
+	for (int column = 0; column < COLUMNS; ++column) {
 		pinMode(columnPins[column], INPUT);
 		digitalWrite(columnPins[column], HIGH);
 	}
 
-	for (int row = 0; row < rowCount; ++row) {
+	for (int row = 0; row < ROWS; ++row) {
 		pinMode(rowPins[row], OUTPUT);
 		digitalWrite(rowPins[row], HIGH);
 	}
 
-	Serial.begin(9600);
+	pinMode(ledPin, OUTPUT);
+	digitalWrite(ledPin, LOW);
+
+	Serial.begin(SERIAL_RATE);
 
 	delay(200);
 }
 
 void loop() {
-	for (uint8_t code = 0x04 /* A */; code <= 0x27 /* 0 */; ++code) {
-		toggleKeyBit(code);
-	}
-	report.modifiers ^= 0b01110111;
+	static uint8_t bitToFlip = K_A_a;
+	static bool isLedLit = false;
+
+	report.modifiers ^= K_MODIFIER_LSHIFT;
+	toggleKeyBit(bitToFlip);
+
+	if (++bitToFlip > K_0_RPAREN)
+		bitToFlip = K_A_a;
+
 	Serial.write((const uint8_t*)&report, sizeof(report));
-	delay(2000);
+	delay(500);
 }
 
 void setKeyBit(uint8_t code) {

@@ -28,6 +28,31 @@
   this software.
 */
 
+/*-
+ * Copyright (c) 2011 Darran Hunt (darran [at] hunt dot net dot nz)
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
+ * THE CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 /** \file
  *
  *  Main source file for the Keyboard demo. This file contains the main tasks of
@@ -62,7 +87,7 @@ USB_ClassInfo_HID_Device_t Keyboard_HID_Interface =
 /** Circular buffer to hold data from the serial port before it is sent to the host. */
 RingBuff_t USARTtoUSB_Buffer;
 
-uint8_t keyboardData[8] = { 0 };
+uint8_t keyboardData[KEYBOARD_EPSIZE] = { 0 };
 uint8_t ledReport = 0;
 
 /** Main program entry point. This routine contains the overall program flow, including initial
@@ -175,8 +200,8 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDIn
 
 	RingBuff_Count_t BufferCount = RingBuffer_GetCount(&USARTtoUSB_Buffer);
 
-	if (BufferCount >= 8) {
-		for (int ind=0; ind<8; ind++) {
+	if (BufferCount >= KEYBOARD_EPSIZE) {
+		for (int ind=0; ind<KEYBOARD_EPSIZE; ind++) {
 			keyboardData[ind] = RingBuffer_Remove(&USARTtoUSB_Buffer);
 		}
 
@@ -184,7 +209,7 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDIn
 		Serial_SendByte(ledReport);
 	}
 
-	for (int ind=0; ind<8; ind++) {
+	for (int ind=0; ind<KEYBOARD_EPSIZE; ind++) {
 		datap[ind] = keyboardData[ind];
 	}
 

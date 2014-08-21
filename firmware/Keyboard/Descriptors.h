@@ -81,7 +81,7 @@
 		#define KEYBOARD_EPADDR              (ENDPOINT_DIR_IN | 1)
 
 		/** Size in bytes of the Keyboard HID reporting IN endpoint. */
-		#define KEYBOARD_EPSIZE              8
+		#define KEYBOARD_EPSIZE              24
 
 	/* Function Prototypes: */
 		uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
