@@ -68,18 +68,22 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM KeyboardReport[] =
 		HID_RI_REPORT_COUNT(8, 0x05),
 		HID_RI_REPORT_SIZE(8, 0x01),
 		HID_RI_OUTPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE | HID_IOF_NON_VOLATILE),
+
 		HID_RI_REPORT_COUNT(8, 0x01),
 		HID_RI_REPORT_SIZE(8, 0x03),
 		HID_RI_OUTPUT(8, HID_IOF_CONSTANT),
 
+#define KEYBOARD_KEY_COUNT ((KEYBOARD_EPSIZE-1)*8)
 		HID_RI_USAGE_PAGE(8, 0x07), /* Key Codes */
-		HID_RI_USAGE_MINIMUM(8, 0x00), /* Keyboard 0 */
-		HID_RI_USAGE_MAXIMUM(8, (KEYBOARD_EPSIZE-1)*8-1), /* Keyboard Right GUI */
+		HID_RI_USAGE_MINIMUM(8, 0x00),
+		HID_RI_USAGE_MAXIMUM(8, KEYBOARD_KEY_COUNT-1),
 		HID_RI_LOGICAL_MINIMUM(8, 0x00),
 		HID_RI_LOGICAL_MAXIMUM(8, 0x01),
-		HID_RI_REPORT_COUNT(8, (KEYBOARD_EPSIZE-1)*8),
+		HID_RI_REPORT_COUNT(8, KEYBOARD_KEY_COUNT),
 		HID_RI_REPORT_SIZE(8, 0x01),
 		HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
+#undef KEYBOARD_KEY_COUNT
+
 	HID_RI_END_COLLECTION(0)
 };
 
@@ -99,7 +103,7 @@ const USB_Descriptor_Device_t PROGMEM DeviceDescriptor =
 
 	.Endpoint0Size          = FIXED_CONTROL_ENDPOINT_SIZE,
 
-	.VendorID               = 0x03EB,
+	.VendorID               = 0xF055,
 	.ProductID              = 0x2042,
 	.ReleaseNumber          = VERSION_BCD(0,0,1),
 
@@ -142,8 +146,8 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
 			.TotalEndpoints         = 1,
 
 			.Class                  = HID_CSCP_HIDClass,
-			.SubClass               = HID_CSCP_BootSubclass,
-			.Protocol               = HID_CSCP_KeyboardBootProtocol,
+			.SubClass               = HID_CSCP_NonBootSubclass,
+			.Protocol               = HID_CSCP_NonBootProtocol,
 
 			.InterfaceStrIndex      = NO_DESCRIPTOR
 		},
@@ -166,7 +170,7 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
 			.EndpointAddress        = KEYBOARD_EPADDR,
 			.Attributes             = (EP_TYPE_INTERRUPT | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
 			.EndpointSize           = KEYBOARD_EPSIZE,
-			.PollingIntervalMS      = 0x05
+			.PollingIntervalMS      = 0x0A
 		},
 };
 

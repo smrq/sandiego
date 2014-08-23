@@ -122,7 +122,7 @@ void SetupHardware()
 	/* Hardware Initialization */
 	LEDs_Init();
 	USB_Init();
-	Serial_Init(9600, false);
+	Serial_Init(SERIAL_RATE, false);
 
 	/* Start the flush timer so that overflows occur rapidly to push received bytes to the USB interface */
 	TCCR0B = (1 << CS02);
@@ -137,7 +137,7 @@ void SetupHardware()
 	UCSR1C = 0;
 
 	/* Special case 57600 baud for compatibility with the ATmega328 bootloader. */	
-	UBRR1  = SERIAL_2X_UBBRVAL(9600);
+	UBRR1  = SERIAL_2X_UBBRVAL(SERIAL_RATE);
 
 	UCSR1C = ((1 << UCSZ11) | (1 << UCSZ10));
 	UCSR1A = (1 << U2X1);

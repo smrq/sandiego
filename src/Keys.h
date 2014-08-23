@@ -97,7 +97,7 @@
 #define K_UP 0x52
 #define K_PAD_NUMLOCK 0x53
 #define K_PAD_DIVIDE 0x54
-#define K_PAD_MULTIPLY 0x55
+#define K_PAD_MULTIPLY 0x55 // max for 8-byte descriptor
 #define K_PAD_MINUS 0x56
 #define K_PAD_PLUS 0x57
 #define K_PAD_ENTER 0x58
@@ -131,7 +131,7 @@
 #define K_EXECUTE 0x74
 #define K_HELP 0x75
 #define K_MENU 0x76
-#define K_SELECT 0x77
+#define K_SELECT 0x77 // max for 16-byte descriptor
 #define K_STOP 0x78
 #define K_AGAIN 0x79
 #define K_UNDO 0x7A
@@ -185,7 +185,7 @@
 #define K_PAD_CURRENCY_UNIT 0xB4
 #define K_PAD_CURRENCY_SUBUNIT 0xB5
 #define K_PAD_LPAREN 0xB6
-#define K_PAD_RPAREN 0xB7
+#define K_PAD_RPAREN 0xB7 // max for 24-byte descriptor
 #define K_PAD_LBRACE 0xB8
 #define K_PAD_RBRACE 0xB9
 #define K_PAD_TAB 0xBA
@@ -233,6 +233,8 @@
 #define K_RSHIFT 0xE5
 #define K_RALT 0xE6
 #define K_RGUI 0xE7
+
+// 0xF8 max for 32-byte descriptor
 
 // Firmware-only keys
 #define K_NULL K_RESERVED_NO_EVENT

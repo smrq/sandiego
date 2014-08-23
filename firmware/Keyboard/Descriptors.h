@@ -41,6 +41,8 @@
 
 		#include <LUFA/Drivers/USB/USB.h>
 
+ 		#include "Constants.h"
+
 	/* Type Defines: */
 		/** Type define for the device configuration descriptor structure. This must be defined in the
 		 *  application code, as the configuration descriptor contains several sub-descriptors which
@@ -81,7 +83,7 @@
 		#define KEYBOARD_EPADDR              (ENDPOINT_DIR_IN | 1)
 
 		/** Size in bytes of the Keyboard HID reporting IN endpoint. */
-		#define KEYBOARD_EPSIZE              24
+		#define KEYBOARD_EPSIZE              REPORT_SIZE
 
 	/* Function Prototypes: */
 		uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
