@@ -56,6 +56,7 @@
 			USB_Descriptor_Interface_t            HID_Interface;
 			USB_HID_Descriptor_HID_t              HID_KeyboardHID;
 			USB_Descriptor_Endpoint_t             HID_ReportINEndpoint;
+			USB_Descriptor_Endpoint_t             HID_ReportOUTEndpoint;
 		} USB_Descriptor_Configuration_t;
 
 		/** Enum for the device interface descriptor IDs within the device. Each interface descriptor
@@ -80,10 +81,13 @@
 
 	/* Macros: */
 		/** Endpoint address of the Keyboard HID reporting IN endpoint. */
-		#define KEYBOARD_EPADDR              (ENDPOINT_DIR_IN | 1)
+		#define KEYBOARD_IN_EPADDR        (ENDPOINT_DIR_IN  | 1)
+
+		/** Endpoint address of the Keyboard HID reporting OUT endpoint. */
+		#define KEYBOARD_OUT_EPADDR       (ENDPOINT_DIR_OUT | 2)
 
 		/** Size in bytes of the Keyboard HID reporting IN endpoint. */
-		#define KEYBOARD_EPSIZE              REPORT_SIZE
+		#define KEYBOARD_EPSIZE           REPORT_SIZE
 
 	/* Function Prototypes: */
 		uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,

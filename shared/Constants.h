@@ -1,4 +1,4 @@
-#define REPORT_SIZE 24
+#define REPORT_SIZE 32
 #define REPORT_BYTES (REPORT_SIZE-1)
 #define SERIAL_RATE 9600
 

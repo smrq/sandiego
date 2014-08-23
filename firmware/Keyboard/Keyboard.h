@@ -56,18 +56,6 @@
  		#include "Constants.h"
 
 	/* Macros: */
-		/** LED mask for the library LED driver, to indicate that the USB interface is not ready. */
-		#define LEDMASK_USB_NOTREADY     LEDS_LED1
-
-		/** LED mask for the library LED driver, to indicate that the USB interface is enumerating. */
-		#define LEDMASK_USB_ENUMERATING  LEDS_LED1
-
-		/** LED mask for the library LED driver, to indicate that the USB interface is ready. */
-		#define LEDMASK_USB_READY        LEDS_LED2
-
-		/** LED mask for the library LED driver, to indicate that an error has occurred in the USB interface. */
-		#define LEDMASK_USB_ERROR        (LEDS_LED1 | LEDS_LED2)
-
 		 /** LED mask for the library LED driver, to indicate TX activity. */
 		#define LEDMASK_TX               LEDS_LED1
 
@@ -77,11 +65,9 @@
 		/** LED mask for the library LED driver, to indicate that an error has occurred in the USB interface. */
 		#define LEDMASK_ERROR            (LEDS_LED1 | LEDS_LED2)
 
-		/** LED mask for the library LED driver, to indicate that the USB interface is busy. */
-		#define LEDMASK_BUSY             (LEDS_LED1 | LEDS_LED2)
-
 	/* Function Prototypes: */
 		void SetupHardware(void);
+		void HID_Task(void);
 
 		void EVENT_USB_Device_Connect(void);
 		void EVENT_USB_Device_Disconnect(void);
@@ -89,16 +75,10 @@
 		void EVENT_USB_Device_ControlRequest(void);
 		void EVENT_USB_Device_StartOfFrame(void);
 
-		bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDInterfaceInfo,
-		                                         uint8_t* const ReportID,
-		                                         const uint8_t ReportType,
-		                                         void* ReportData,
-		                                         uint16_t* const ReportSize);
-		void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t* const HIDInterfaceInfo,
-		                                          const uint8_t ReportID,
-		                                          const uint8_t ReportType,
-		                                          const void* ReportData,
-		                                          const uint16_t ReportSize);
+		bool CreateKeyboardReport(USB_KeyboardReport_Data_t* const ReportData);
+		void ProcessLEDReport(const uint8_t LEDReport);
+		void SendNextReport(void);
+		void ReceiveNextReport(void);
 
 #endif
 

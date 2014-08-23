@@ -45,11 +45,6 @@
  */
 const USB_Descriptor_HIDReport_Datatype_t PROGMEM KeyboardReport[] =
 {
-	/* Use the HID class driver's standard Keyboard report.
-	 *   Max simultaneous keys: 6
-	 */
-	//HID_DESCRIPTOR_KEYBOARD(6)
-
 	HID_RI_USAGE_PAGE(8, 0x01), /* Generic Desktop */
 	HID_RI_USAGE(8, 0x06), /* Keyboard */
 	HID_RI_COLLECTION(8, 0x01), /* Application */
@@ -143,11 +138,11 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
 			.InterfaceNumber        = INTERFACE_ID_Keyboard,
 			.AlternateSetting       = 0x00,
 
-			.TotalEndpoints         = 1,
+			.TotalEndpoints         = 2,
 
 			.Class                  = HID_CSCP_HIDClass,
-			.SubClass               = HID_CSCP_NonBootSubclass,
-			.Protocol               = HID_CSCP_NonBootProtocol,
+			.SubClass               = HID_CSCP_BootSubclass,
+			.Protocol               = HID_CSCP_KeyboardBootProtocol,
 
 			.InterfaceStrIndex      = NO_DESCRIPTOR
 		},
@@ -167,11 +162,21 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
 		{
 			.Header                 = {.Size = sizeof(USB_Descriptor_Endpoint_t), .Type = DTYPE_Endpoint},
 
-			.EndpointAddress        = KEYBOARD_EPADDR,
+			.EndpointAddress        = KEYBOARD_IN_EPADDR,
 			.Attributes             = (EP_TYPE_INTERRUPT | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
 			.EndpointSize           = KEYBOARD_EPSIZE,
-			.PollingIntervalMS      = 0x0A
+			.PollingIntervalMS      = 0x05
 		},
+
+	.HID_ReportOUTEndpoint =
+		{
+			.Header                 = {.Size = sizeof(USB_Descriptor_Endpoint_t), .Type = DTYPE_Endpoint},
+
+			.EndpointAddress        = KEYBOARD_OUT_EPADDR,
+			.Attributes             = (EP_TYPE_INTERRUPT | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
+			.EndpointSize           = KEYBOARD_EPSIZE,
+			.PollingIntervalMS      = 0x05
+		}
 };
 
 /** Language descriptor structure. This descriptor, located in FLASH memory, is returned when the host requests
