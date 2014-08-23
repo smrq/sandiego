@@ -43,17 +43,19 @@
  *  the device will send, and what it may be sent back from the host. Refer to the HID specification for
  *  more details on HID report descriptors.
  */
+
 const USB_Descriptor_HIDReport_Datatype_t PROGMEM KeyboardReport[] =
 {
 	HID_RI_USAGE_PAGE(8, 0x01), /* Generic Desktop */
 	HID_RI_USAGE(8, 0x06), /* Keyboard */
 	HID_RI_COLLECTION(8, 0x01), /* Application */
+
 		HID_RI_USAGE_PAGE(8, 0x07), /* Key Codes */
-		HID_RI_USAGE_MINIMUM(8, 0xE0), /* Keyboard Left Control */
-		HID_RI_USAGE_MAXIMUM(8, 0xE7), /* Keyboard Right GUI */
+		HID_RI_USAGE_MINIMUM(8, 0x00),
+		HID_RI_USAGE_MAXIMUM(8, 0xFF),
 		HID_RI_LOGICAL_MINIMUM(8, 0x00),
 		HID_RI_LOGICAL_MAXIMUM(8, 0x01),
-		HID_RI_REPORT_COUNT(8, 0x08),
+		HID_RI_REPORT_COUNT(16, 0x0100),
 		HID_RI_REPORT_SIZE(8, 0x01),
 		HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
 
@@ -67,17 +69,6 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM KeyboardReport[] =
 		HID_RI_REPORT_COUNT(8, 0x01),
 		HID_RI_REPORT_SIZE(8, 0x03),
 		HID_RI_OUTPUT(8, HID_IOF_CONSTANT),
-
-#define KEYBOARD_KEY_COUNT ((KEYBOARD_EPSIZE-1)*8)
-		HID_RI_USAGE_PAGE(8, 0x07), /* Key Codes */
-		HID_RI_USAGE_MINIMUM(8, 0x00),
-		HID_RI_USAGE_MAXIMUM(8, KEYBOARD_KEY_COUNT-1),
-		HID_RI_LOGICAL_MINIMUM(8, 0x00),
-		HID_RI_LOGICAL_MAXIMUM(8, 0x01),
-		HID_RI_REPORT_COUNT(8, KEYBOARD_KEY_COUNT),
-		HID_RI_REPORT_SIZE(8, 0x01),
-		HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
-#undef KEYBOARD_KEY_COUNT
 
 	HID_RI_END_COLLECTION(0)
 };

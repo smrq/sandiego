@@ -4,11 +4,6 @@
 #include "Keys.h"
 #include "Keymap.h"
 
-typedef struct {
-	uint8_t modifiers;
-	uint8_t keys[REPORT_BYTES];
-} report_keyboard_t;
-
 const int rowPins[ROWS] = { 12, 14, 15, 16, 17, 18, 19 };
 const int columnPins[COLUMNS] = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 const int ledPin = 13;
@@ -34,8 +29,8 @@ const int keyMap[LAYERS][ROWS][COLUMNS] = {
 	)
 };
 
-report_keyboard_t report;
-report_keyboard_t lastReport;
+uint8_t report[REPORT_SIZE];
+uint8_t lastReport[REPORT_SIZE];
 
 bool ledPinLow = true;
 
@@ -76,13 +71,11 @@ int determineLayer(bool pressedKeys[][COLUMNS]) {
 }
 
 bool reportChanged() {
-	if (report.modifiers != lastReport.modifiers)
-		return true;
-	for (int i = 0; i < REPORT_BYTES; ++i) {
-		if (report.keys[i] != lastReport.keys[i])
-			return true;
-	}
-	return false;
+	return memcmp(report, lastReport, REPORT_SIZE) != 0;
+}
+
+void saveReport() {
+	memcpy(lastReport, report, REPORT_SIZE);
 }
 
 void loop() {
@@ -108,22 +101,18 @@ void loop() {
 	}
 
 	if (reportChanged()) {
-		Serial.write((const uint8_t*)&report, sizeof(report));
-		lastReport = report;
+		Serial.write(report, REPORT_SIZE);
+		saveReport();
 		digitalWrite(ledPin, (ledPinLow = !ledPinLow) ? LOW : HIGH);
 	}
 }
 
 void setKeyBit(int code) {
-	if (code >= K_LCTRL && code <= K_RGUI)
-		report.modifiers |= 1<<(code - K_LCTRL);
-	else if ((code >> 3) < REPORT_BYTES)
-		report.keys[code >> 3] |= 1<<(code & 0x7);
+	if ((code >> 3) < REPORT_SIZE)
+		report[code >> 3] |= 1<<(code & 0x7);
 }
 
 void unsetKeyBit(int code) {
-	if (code >= K_LCTRL && code <= K_RGUI)
-		report.modifiers &= ~(1<<(code - K_LCTRL));
-	else if ((code >> 3) < REPORT_BYTES)
-		report.keys[code >> 3] &= ~(1<<(code & 0x7));
+	if ((code >> 3) < REPORT_SIZE)
+		report[code >> 3] &= ~(1<<(code & 0x7));
 }

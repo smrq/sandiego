@@ -168,15 +168,15 @@ void EVENT_USB_Device_ControlRequest(void)
 		case HID_REQ_GetReport:
 			if (USB_ControlRequest.bmRequestType == (REQDIR_DEVICETOHOST | REQTYPE_CLASS | REQREC_INTERFACE))
 			{
-				USB_KeyboardReport_Data_t KeyboardReportData;
+				uint8_t KeyboardReportData[KEYBOARD_EPSIZE];
 
 				/* Create the next keyboard report for transmission to the host */
-				CreateKeyboardReport(&KeyboardReportData);
+				CreateKeyboardReport(KeyboardReportData);
 
 				Endpoint_ClearSETUP();
 
 				/* Write the report data to the control endpoint */
-				Endpoint_Write_Control_Stream_LE(&KeyboardReportData, sizeof(KeyboardReportData));
+				Endpoint_Write_Control_Stream_LE(KeyboardReportData, sizeof(KeyboardReportData));
 				Endpoint_ClearOUT();
 			}
 
@@ -268,13 +268,13 @@ void EVENT_USB_Device_StartOfFrame(void)
  *  \param[out] ReportData  Pointer to a HID report data structure to be filled
  *  Returns whether there was a new report to send.
  */
-bool CreateKeyboardReport(USB_KeyboardReport_Data_t* const ReportData)
+bool CreateKeyboardReport(uint8_t ReportData[])
 {
 	RingBuff_Count_t BufferCount = RingBuffer_GetCount(&USARTtoUSB_Buffer);
 
 	if (BufferCount >= KEYBOARD_EPSIZE) {
 		for (int i=0; i<KEYBOARD_EPSIZE; ++i) {
-			((uint8_t*)ReportData)[i] = RingBuffer_Remove(&USARTtoUSB_Buffer);
+			ReportData[i] = RingBuffer_Remove(&USARTtoUSB_Buffer);
 		}
 		return true;
 	}
@@ -296,11 +296,10 @@ void ProcessLEDReport(const uint8_t LEDReport)
 /** Sends the next HID report to the host, via the keyboard data endpoint. */
 void SendNextReport(void)
 {
-	static USB_KeyboardReport_Data_t KeyboardReportData;
-	//memset(KeyboardReportData, 0, sizeof(USB_KeyboardReport_Data_t));
+	static uint8_t KeyboardReportData[KEYBOARD_EPSIZE];
 
 	/* Create the next keyboard report for transmission to the host */
-	bool SendReport = CreateKeyboardReport(&KeyboardReportData);
+	bool SendReport = CreateKeyboardReport(KeyboardReportData);
 
 	/* Check if the idle period is set and has elapsed */
 	if (IdleCount && (!(IdleMSRemaining)))
@@ -319,7 +318,7 @@ void SendNextReport(void)
 	if (Endpoint_IsReadWriteAllowed() && SendReport)
 	{
 		/* Write Keyboard Report Data */
-		Endpoint_Write_Stream_LE(&KeyboardReportData, sizeof(KeyboardReportData), NULL);
+		Endpoint_Write_Stream_LE(KeyboardReportData, sizeof(KeyboardReportData), NULL);
 
 		/* Finalize the stream transfer to send the last packet */
 		Endpoint_ClearIN();
