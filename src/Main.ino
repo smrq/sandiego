@@ -70,6 +70,10 @@ int determineLayer(bool pressedKeys[][COLUMNS]) {
 	return layer;
 }
 
+void resetReport() {
+	memset(report, 0, REPORT_SIZE);
+}
+
 bool reportChanged() {
 	return memcmp(report, lastReport, REPORT_SIZE) != 0;
 }
@@ -91,12 +95,11 @@ void loop() {
 
 	int layer = determineLayer(pressedKeys);
 
+	resetReport();
 	for (int r = 0; r < ROWS; ++r) {
 		for (int c = 0; c < COLUMNS; ++c) {
 			if (pressedKeys[r][c])
 				setKeyBit(keyMap[layer][r][c]);
-			else
-				unsetKeyBit(keyMap[layer][r][c]);
 		}
 	}
 
@@ -110,9 +113,4 @@ void loop() {
 void setKeyBit(int code) {
 	if ((code >> 3) < REPORT_SIZE)
 		report[code >> 3] |= 1<<(code & 0x7);
-}
-
-void unsetKeyBit(int code) {
-	if ((code >> 3) < REPORT_SIZE)
-		report[code >> 3] &= ~(1<<(code & 0x7));
 }
