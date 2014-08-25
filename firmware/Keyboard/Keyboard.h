@@ -56,13 +56,8 @@
  		#include "Constants.h"
 
 	/* Macros: */
-		 /** LED mask for the library LED driver, to indicate TX activity. */
-		#define LEDMASK_TX               LEDS_LED1
-
-		/** LED mask for the library LED driver, to indicate RX activity. */
-		#define LEDMASK_RX               LEDS_LED2
-
-		/** LED mask for the library LED driver, to indicate that an error has occurred in the USB interface. */
+		#define LEDMASK_RX               LEDS_LED1
+		#define LEDMASK_TX               LEDS_LED2
 		#define LEDMASK_ERROR            (LEDS_LED1 | LEDS_LED2)
 
 	/* Function Prototypes: */

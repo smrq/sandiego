@@ -135,6 +135,7 @@ void EVENT_USB_Device_Connect(void)
 {
 	/* Default to report protocol on connect */
 	UsingReportProtocol = true;
+	LEDs_TurnOnLEDs(LEDMASK_RX);
 }
 
 /** Event handler for the library USB Disconnection event. */
@@ -225,6 +226,10 @@ void EVENT_USB_Device_ControlRequest(void)
 
 				/* Set or clear the flag depending on what the host indicates that the current Protocol should be */
 				UsingReportProtocol = (USB_ControlRequest.wValue != 0);
+				if (UsingReportProtocol)
+					LEDs_TurnOnLEDs(LEDMASK_RX);
+				else
+					LEDs_TurnOffLEDs(LEDMASK_RX);
 			}
 
 			break;
@@ -292,6 +297,24 @@ void ProcessLEDReport(const uint8_t LEDReport)
 	Serial_SendByte(LEDReport);
 }
 
+/** Creates a boot-compatible keyboard report.
+ *
+ *  \param[in] report  NKRO-compatible keyboard report
+ */
+USB_KeyboardReport_Data_t CreateBootKeyboardReport(uint8_t report[]) {
+	USB_KeyboardReport_Data_t bootReport = { 0 };
+	int usedKeys = 0;
+
+	bootReport.Modifier = report[0xE0 >> 3];
+	for (int code = 0; code < 0xE0; ++code) {
+		if ((report[code >> 3] & 1<<(code & 0x7)) != 0) {
+			bootReport.KeyCode[usedKeys] = code;
+			if (++usedKeys >= 6)
+				break;
+		}
+	}
+	return bootReport;
+}
 
 /** Sends the next HID report to the host, via the keyboard data endpoint. */
 void SendNextReport(void)
@@ -318,7 +341,12 @@ void SendNextReport(void)
 	if (Endpoint_IsReadWriteAllowed() && SendReport)
 	{
 		/* Write Keyboard Report Data */
-		Endpoint_Write_Stream_LE(KeyboardReportData, sizeof(KeyboardReportData), NULL);
+		if (UsingReportProtocol) {
+			Endpoint_Write_Stream_LE(KeyboardReportData, sizeof(KeyboardReportData), NULL);
+		} else {
+			USB_KeyboardReport_Data_t BootKeyboardReportData = CreateBootKeyboardReport(KeyboardReportData);
+			Endpoint_Write_Stream_LE(&BootKeyboardReportData, sizeof(BootKeyboardReportData), NULL);
+		}
 
 		/* Finalize the stream transfer to send the last packet */
 		Endpoint_ClearIN();
@@ -348,8 +376,6 @@ void ReceiveNextReport(void)
 
 		/* Handshake the OUT Endpoint - clear endpoint and ready for next report */
 		Endpoint_ClearOUT();
-
-		LEDs_ToggleLEDs(LEDMASK_RX);
 	}
 }
 
