@@ -29,12 +29,13 @@ const int keyMap[LAYERS][ROWS][COLUMNS] = {
 	)
 };
 
-uint8_t report[REPORT_SIZE];
-uint8_t lastReport[REPORT_SIZE];
-
-bool ledPinLow = true;
-
 void setup() {
+	initializePins();
+	Serial.begin(SERIAL_RATE);
+	delay(200);
+}
+
+void initializePins() {
 	for (int column = 0; column < COLUMNS; ++column) {
 		pinMode(columnPins[column], INPUT);
 		digitalWrite(columnPins[column], HIGH);
@@ -47,13 +48,19 @@ void setup() {
 
 	pinMode(ledPin, OUTPUT);
 	digitalWrite(ledPin, LOW);
-
-	Serial.begin(SERIAL_RATE);
-
-	delay(200);
 }
 
-int determineLayer(bool pressedKeys[][COLUMNS]) {
+void scanKeys(bool pressedKeys[][COLUMNS]) {
+	for (int r = 0; r < ROWS; ++r) {
+		digitalWrite(rowPins[r], LOW);
+		for (int c = 0; c < COLUMNS; ++c) {
+			pressedKeys[r][c] = (digitalRead(columnPins[c]) == LOW);
+		}
+		digitalWrite(rowPins[r], HIGH);
+	}
+}
+
+int determineLayer(const bool pressedKeys[][COLUMNS]) {
 	int layer = 0;
 	for (int r = 0; r < ROWS; ++r) {
 		for (int c = 0; c < COLUMNS; ++c) {
@@ -70,47 +77,37 @@ int determineLayer(bool pressedKeys[][COLUMNS]) {
 	return layer;
 }
 
-void resetReport() {
-	memset(report, 0, REPORT_SIZE);
+void setKeyBit(uint8_t report[], int code) {
+	if ((code >> 3) < REPORT_SIZE)
+		report[code >> 3] |= 1<<(code & 0x7);
 }
 
-bool reportChanged() {
-	return memcmp(report, lastReport, REPORT_SIZE) != 0;
-}
-
-void saveReport() {
-	memcpy(lastReport, report, REPORT_SIZE);
-}
-
-void loop() {
-	bool pressedKeys[ROWS][COLUMNS];
-
-	for (int r = 0; r < ROWS; ++r) {
-		digitalWrite(rowPins[r], LOW);
-		for (int c = 0; c < COLUMNS; ++c) {
-			pressedKeys[r][c] = (digitalRead(columnPins[c]) == LOW);
-		}
-		digitalWrite(rowPins[r], HIGH);
-	}
-
-	int layer = determineLayer(pressedKeys);
-
-	resetReport();
+void populateReport(const bool pressedKeys[][COLUMNS], int layer, uint8_t report[]) {
 	for (int r = 0; r < ROWS; ++r) {
 		for (int c = 0; c < COLUMNS; ++c) {
 			if (pressedKeys[r][c])
-				setKeyBit(keyMap[layer][r][c]);
+				setKeyBit(report, keyMap[layer][r][c]);
 		}
-	}
-
-	if (reportChanged()) {
-		Serial.write(report, REPORT_SIZE);
-		saveReport();
-		digitalWrite(ledPin, (ledPinLow = !ledPinLow) ? LOW : HIGH);
 	}
 }
 
-void setKeyBit(int code) {
-	if ((code >> 3) < REPORT_SIZE)
-		report[code >> 3] |= 1<<(code & 0x7);
+void toggleLED() {
+	static bool ledPinLow = true;
+	digitalWrite(ledPin, (ledPinLow = !ledPinLow) ? LOW : HIGH);
+}
+
+void loop() {
+	static uint8_t lastReport[REPORT_SIZE] = { 0 };
+	bool pressedKeys[ROWS][COLUMNS] = { 0 };
+	uint8_t report[REPORT_SIZE] = { 0 };
+
+	scanKeys(pressedKeys);
+	int layer = determineLayer(pressedKeys);
+	populateReport(pressedKeys, layer, report);
+	
+	if (memcmp(lastReport, report, REPORT_SIZE) != 0) {
+		Serial.write(report, REPORT_SIZE);
+		memcpy(lastReport, report, REPORT_SIZE);
+		toggleLED();
+	}
 }
