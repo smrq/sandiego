@@ -21,8 +21,8 @@ const int keyMap[LAYERS][ROWS][COLUMNS] = {
 	KEYMAP(
 		F13,    F14,     F15,  F16,  F17,  F18,                            F19,    F20,      F21,    F22,    F23,       F24,
 		DOLLAR, CARET,   7,    8,    9,    ASTERISK, NULL,       NULL,     LPAREN, RPAREN,   LBRACE, RBRACE, LBRACKET,  RBRACKET,
-		HASH,   PERCENT, 4,    5,    6,    PLUS,     NUMLOCK,    CAPSLOCK, LEFT,   DOWN,     UP,     RIGHT,  BANG,      AMPERSAND,
-		AT,     0,       1,    2,    3,    EQUAL,    SCROLLLOCK, PAUSE,    HOME,   PAGEDOWN, PAGEUP, END,    BACKSLASH, PIPE,
+		HASH,   0,       4,    5,    6,    EQUAL,    NUMLOCK,    CAPSLOCK, LEFT,   DOWN,     UP,     RIGHT,  BANG,      AMPERSAND,
+		AT,     PERCENT, 1,    2,    3,    PLUS,     SCROLLLOCK, PAUSE,    HOME,   PAGEDOWN, PAGEUP, END,    BACKSLASH, PIPE,
 
 		NULL, LCTRL, LSHIFT, SPACE, LGUI, LALT,
 		RALT, RGUI, SPACE, RSHIFT, RCTRL, NULL
