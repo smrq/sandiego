@@ -8,52 +8,52 @@ Array.prototype.zip = function zip() {
 };
 
 var labels = {
-	GRAVE: '~\n`',
-	ESC: 'Esc\n',
-	INSERT: 'Ins\n',
-	DELETE: 'Del\n',
-	HOME: 'Home\n',
-	END: 'End\n',
-	PAGEUP: 'PgUp\n',
-	PAGEDOWN: 'PgDn\n',
-	BACKSPACE: 'Bksp\n',
-	SPACE: 'Space\n',
-	LEFT: '←\n',
-	DOWN: '↓\n',
-	UP: '↑\n',
-	RIGHT: '→\n',
-	CAPSLOCK: '\nCapsLk',
-	SCROLLLOCK: '\nScrLk',
-	NUMLOCK: '\nNumLk',
-	COMMA: '<\n,',
-	PERIOD: '>\n.',
-	SLASH: '?\n/',
-	BACKSLASH: '|\n\\',
-	QUOTE: '"\n\'',
-	SEMICOLON: ':\n;',
-	DASH: '_\n-',
-	EQUAL: '+\n=',
-	LBRACKET: '{\n[',
-	RBRACKET: '}\n]',
-	TAB: 'Tab\n',
-	RETURN: 'Retn\n',
-	PRINTSCREEN_SYSRQ: '\nPrSc',
-	PAUSE_BREAK: '\nPause',
-	'1': '!\n1',
-	'2': '@\n2',
-	'3': '#\n3',
-	'4': '$\n4',
-	'5': '%\n5',
-	'6': '^\n6',
-	'7': '&\n7',
-	'8': '*\n8',
-	'9': '(\n9',
-	'0': ')\n0'
+	GRAVE_TILDE: ['~','`'],
+	ESC: 'Esc',
+	INSERT: 'Ins',
+	DELETE: 'Del',
+	HOME: 'Home',
+	END: 'End',
+	PAGEUP: 'Pg↑',
+	PAGEDOWN: 'Pg↓',
+	BACKSPACE: 'Bksp',
+	SPACE: 'Space',
+	LEFT: '←',
+	DOWN: '↓',
+	UP: '↑',
+	RIGHT: '→',
+	CAPSLOCK: 'CapsLk',
+	SCROLLLOCK: 'ScrLk',
+	NUMLOCK: 'NumLk',
+	COMMA_LANGLE: ['<',','],
+	PERIOD_RANGLE: ['>','.'],
+	SLASH_QUESTION: ['?','/'],
+	BACKSLASH: '\\',
+	PIPE: '|',
+	QUOTE_DOUBLE: ['"',"'"],
+	SEMICOLON_COLON: [':',';'],
+	DASH_UNDERSCORE: ['_','-'],
+	EQUAL: '=',
+	PLUS: '+',
+	BANG: '!',
+	AT: '@',
+	HASH: '#',
+	DOLLAR: '$',
+	PERCENT: '%',
+	CARET: '^',
+	AMPERSAND: '&',
+	ASTERISK: '*',
+	LBRACKET: '[',
+	RBRACKET: ']',
+	LBRACE: '{',
+	RBRACE: '}',
+	LPAREN: '(',
+	RPAREN: ')',
+	TAB: 'Tab',
+	RETURN: 'Retn',
+	PRINTSCREEN: 'PrSc',
+	PAUSE: 'Pause'
 };
-for (var c = 'A'; c <= 'Z'; c = String.fromCharCode(c.charCodeAt(0) + 1)) {
-	labels[c] = c + '\n';
-}
-
 
 var cols = [
 	{x: 0.5, y: 0.875},
@@ -76,18 +76,33 @@ var cols = [
 var mainCode = require('fs').readFileSync('src/Main.ino');
 var keymap = /keyMap\[LAYERS\]\[ROWS\]\[COLUMNS\] = {([^\}]+)}/
 	.exec(mainCode)[1]
-	.split('KEYMAP')
+	.split('KEYMAP(')
 	.slice(1)
 	.map(function (code) {
-		return code.replace(/[^A-Za-z0-9_]/g, ' ')
+		return code.replace(/[^A-Za-z0-9_()]/g, ' ')
 			.trim()
 			.split(/\s+/);
 	})
 	.zip();
 var keyLabels = keymap.map(function (keyLayers) {
-	return keyLayers.map(function (l) { return l === 'NULL' ? '' : l })
-		.map(function (l) { return labels[l] || l + '\n'; })
-		.join('\n');
+	var unjoinedLabels = keyLayers.map(function (l) { return l === 'NULL' ? '' : l })
+		.map(function (l) { return labels[l] || l });
+	if (unjoinedLabels[0] === unjoinedLabels[1])
+		return unjoinedLabels[0];
+
+	if (typeof(unjoinedLabels[0]) === 'string') {
+		unjoinedLabels[0] = unjoinedLabels[0] + '\n';
+	} else {
+		unjoinedLabels[0] = unjoinedLabels[0].join('\n');
+	}
+
+	if (typeof(unjoinedLabels[1]) === 'string') {
+		unjoinedLabels[1] = '\n' + unjoinedLabels[1];
+	} else {
+		unjoinedLabels[1] = unjoinedLabels[0].join('\n');
+	}
+
+	return unjoinedLabels.join('\n');
 });
 
 function keyCoord(row, col, highlight, width, height, rotation, ry) {
