@@ -1,295 +1,161 @@
-#define K_MODIFIER_LCTRL   (1 << 0)
-#define K_MODIFIER_LSHIFT  (1 << 1)
-#define K_MODIFIER_LALT    (1 << 2)
-#define K_MODIFIER_LGUI    (1 << 3)
-#define K_MODIFIER_RCTRL   (1 << 4)
-#define K_MODIFIER_RSHIFT  (1 << 5)
-#define K_MODIFIER_RALT    (1 << 6)
-#define K_MODIFIER_RGUI    (1 << 7)
+#include "UsbPages.h"
 
-#define K_LED_NUMLOCK      (1 << 0)
-#define K_LED_CAPSLOCK     (1 << 1)
-#define K_LED_SCROLLLOCK   (1 << 2)
-#define K_LED_KANA         (1 << 3)
+#define KB_CODE_MASK     0xFF
+#define KB_HARDWARE_KEY  (1 << 8)
+#define KB_UNSHIFTED_KEY (1 << 9)
+#define KB_SHIFTED_KEY   (1 << 10)
+#define KB_LAYER_SHIFT   (1 << 11)
+#define KB_LAYER_SWITCH  (1 << 12)
 
-#define K_RESERVED_NO_EVENT 0x00
-#define K_ERROR_ROLL_OVER 0x01
-#define K_POST_FAIL 0x02
-#define K_ERROR_UNDEFINED 0x03
-#define K_A_a 0x04
-#define K_B_b 0x05
-#define K_C_c 0x06
-#define K_D_d 0x07
-#define K_E_e 0x08
-#define K_F_f 0x09
-#define K_G_g 0x0A
-#define K_H_h 0x0B
-#define K_I_i 0x0C
-#define K_J_j 0x0D
-#define K_K_k 0x0E
-#define K_L_l 0x0F
-#define K_M_m 0x10
-#define K_N_n 0x11
-#define K_O_o 0x12
-#define K_P_p 0x13
-#define K_Q_q 0x14
-#define K_R_r 0x15
-#define K_S_s 0x16
-#define K_T_t 0x17
-#define K_U_u 0x18
-#define K_V_v 0x19
-#define K_W_w 0x1A
-#define K_X_x 0x1B
-#define K_Y_y 0x1C
-#define K_Z_z 0x1D
-#define K_1_BANG 0x1E
-#define K_2_AT 0x1F
-#define K_3_HASH 0x20
-#define K_4_DOLLAR 0x21
-#define K_5_PERCENT 0x22
-#define K_6_CARET 0x23
-#define K_7_AMPERSAND 0x24
-#define K_8_ASTERISK 0x25
-#define K_9_LPAREN 0x26
-#define K_0_RPAREN 0x27
-#define K_RETURN 0x28
-#define K_ESCAPE 0x29
-#define K_BACKSPACE 0x2A
-#define K_TAB 0x2B
-#define K_SPACE 0x2C
-#define K_DASH_UNDERSCORE 0x2D
-#define K_EQUAL_PLUS 0x2E
-#define K_LBRACKET_LBRACE 0x2F
-#define K_RBRACKET_RBRACE 0x30
-#define K_BACKSLASH_PIPE 0x31
-#define K_NON_US_HASH_TILDE 0x32
-#define K_SEMICOLON_COLON 0x33
-#define K_QUOTE_DOUBLEQUOTE 0x34
-#define K_GRAVE_TILDE 0x35
-#define K_COMMA_LANGLE 0x36
-#define K_PERIOD_RANGLE 0x37
-#define K_SLASH_QUESTION 0x38
-#define K_CAPSLOCK 0x39
-#define K_F1 0x3A
-#define K_F2 0x3B
-#define K_F3 0x3C
-#define K_F4 0x3D
-#define K_F5 0x3E
-#define K_F6 0x3F
-#define K_F7 0x40
-#define K_F8 0x41
-#define K_F9 0x42
-#define K_F10 0x43
-#define K_F11 0x44
-#define K_F12 0x45
-#define K_PRINTSCREEN_SYSRQ 0x46
-#define K_SCROLLLOCK 0x47
-#define K_PAUSE_BREAK 0x48
-#define K_INSERT 0x49
-#define K_HOME 0x4A
-#define K_PAGEUP 0x4B
-#define K_DELETE 0x4C
-#define K_END 0x4D
-#define K_PAGEDOWN 0x4E
-#define K_RIGHT 0x4F
-#define K_LEFT 0x50
-#define K_DOWN 0x51
-#define K_UP 0x52
-#define K_PAD_NUMLOCK 0x53
-#define K_PAD_DIVIDE 0x54
-#define K_PAD_MULTIPLY 0x55 // max for 8-byte descriptor
-#define K_PAD_MINUS 0x56
-#define K_PAD_PLUS 0x57
-#define K_PAD_ENTER 0x58
-#define K_PAD_1_END 0x59
-#define K_PAD_2_DOWN 0x5A
-#define K_PAD_3_PAGEDOWN 0x5B
-#define K_PAD_4_LEFT 0x5C
-#define K_PAD_5 0x5D
-#define K_PAD_6_RIGHT 0x5E
-#define K_PAD_7_HOME 0x5F
-#define K_PAD_8_UP 0x60
-#define K_PAD_9_PAGEUP 0x61
-#define K_PAD_0_INSERT 0x62
-#define K_PAD_PERIOD_DELETE 0x63
-#define K_NON_US_BACKSLASH_PIPE 0x64
-#define K_APPLICATION 0x65
-#define K_POWER 0x66
-#define K_PAD_EQUAL 0x67
-#define K_F13 0x68
-#define K_F14 0x69
-#define K_F15 0x6A
-#define K_F16 0x6B
-#define K_F17 0x6C
-#define K_F18 0x6D
-#define K_F19 0x6E
-#define K_F20 0x6F
-#define K_F21 0x70
-#define K_F22 0x71
-#define K_F23 0x72
-#define K_F24 0x73
-#define K_EXECUTE 0x74
-#define K_HELP 0x75
-#define K_MENU 0x76
-#define K_SELECT 0x77 // max for 16-byte descriptor
-#define K_STOP 0x78
-#define K_AGAIN 0x79
-#define K_UNDO 0x7A
-#define K_CUT 0x7B
-#define K_COPY 0x7C
-#define K_PASTE 0x7D
-#define K_FIND 0x7E
-#define K_MUTE 0x7F
-#define K_VOLUMEUP 0x80
-#define K_VOLUMEDOWN 0x81
-#define K_LOCKING_CAPSLOCK 0x82
-#define K_LOCKING_NUMLOCK 0x83
-#define K_LOCKING_SCROLLLOCK 0x84
-#define K_PAD_COMMA 0x85
-#define K_PAD_EQUAL_AS400 0x86
-#define K_INTERNATIONAL1 0x87
-#define K_INTERNATIONAL2 0x88
-#define K_INTERNATIONAL3 0x89
-#define K_INTERNATIONAL4 0x8A
-#define K_INTERNATIONAL5 0x8B
-#define K_INTERNATIONAL6 0x8C
-#define K_INTERNATIONAL7 0x8D
-#define K_INTERNATIONAL8 0x8E
-#define K_INTERNATIONAL9 0x8F
-#define K_LANG1 0x90
-#define K_LANG2 0x91
-#define K_LANG3 0x92
-#define K_LANG4 0x93
-#define K_LANG5 0x94
-#define K_LANG6 0x95
-#define K_LANG7 0x96
-#define K_LANG8 0x97
-#define K_LANG9 0x98
-#define K_ALTERNATE_ERASE 0x99
-#define K_SYSRQ_ATTENTION 0x9A
-#define K_CANCEL 0x9B
-#define K_CLEAR 0x9C
-#define K_PRIOR 0x9D
-#define K_RETURN2 0x9E
-#define K_SEPARATOR 0x9F
-#define K_OUT 0xA0
-#define K_OPER 0xA1
-#define K_CLEAR_AGAIN 0xA2
-#define K_CRSEL_PROPS 0xA3
-#define K_EXSEL 0xA4
+#define K_NULL 0
 
-#define K_PAD_00 0xB0
-#define K_PAD_000 0xB1
-#define K_PAD_THOUSANDS_SEPARATOR 0xB2
-#define K_PAD_DECIMAL_SEPARATOR 0xB3
-#define K_PAD_CURRENCY_UNIT 0xB4
-#define K_PAD_CURRENCY_SUBUNIT 0xB5
-#define K_PAD_LPAREN 0xB6
-#define K_PAD_RPAREN 0xB7 // max for 24-byte descriptor
-#define K_PAD_LBRACE 0xB8
-#define K_PAD_RBRACE 0xB9
-#define K_PAD_TAB 0xBA
-#define K_PAD_BACKSPACE 0xBB
-#define K_PAD_A 0xBC
-#define K_PAD_B 0xBD
-#define K_PAD_C 0xBE
-#define K_PAD_D 0xBF
-#define K_PAD_E 0xC0
-#define K_PAD_F 0xC1
-#define K_PAD_XOR 0xC2
-#define K_PAD_CARET 0xC3
-#define K_PAD_PERCENT 0xC4
-#define K_PAD_LANGLE 0xC5
-#define K_PAD_RANGLE 0xC6
-#define K_PAD_AMPERSAND 0xC7
-#define K_PAD_DOUBLE_AMPERSAND 0xC8
-#define K_PAD_PIPE 0xC9
-#define K_PAD_DOUBLE_PIPE 0xCA
-#define K_PAD_COLON 0xCB
-#define K_PAD_HASH 0xCC
-#define K_PAD_SPACE 0xCD
-#define K_PAD_AT 0xCE
-#define K_PAD_BANG 0xCF
-#define K_PAD_MEMORY_STORE 0xD0
-#define K_PAD_MEMORY_RECALL 0xD1
-#define K_PAD_MEMORY_CLEAR 0xD2
-#define K_PAD_MEMORY_ADD 0xD3
-#define K_PAD_MEMORY_SUBTRACT 0xD4
-#define K_PAD_MEMORY_MULTIPLY 0xD5
-#define K_PAD_MEMORY_DIVIDE 0xD6
-#define K_PAD_PLUS_MINUS 0xD7
-#define K_PAD_CLEAR 0xD8
-#define K_PAD_CLEAR_ENTRY 0xD9
-#define K_PAD_BINARY 0xDA
-#define K_PAD_OCTAL 0xDB
-#define K_PAD_DECIMAL 0xDC
-#define K_PAD_HEXADECIMAL 0xDD
+#define K_LAYER_SHIFT(n)  (n | KB_LAYER_SHIFT)
+#define K_LAYER_SWITCH(n) (n | KB_LAYER_SWITCH)
 
-#define K_LCTRL 0xE0
-#define K_LSHIFT 0xE1
-#define K_LALT 0xE2
-#define K_LGUI 0xE3
-#define K_RCTRL 0xE4
-#define K_RSHIFT 0xE5
-#define K_RALT 0xE6
-#define K_RGUI 0xE7
+#define K_A (KEY_USB_A_a | KB_HARDWARE_KEY)
+#define K_B (KEY_USB_B_b | KB_HARDWARE_KEY)
+#define K_C (KEY_USB_C_c | KB_HARDWARE_KEY)
+#define K_D (KEY_USB_D_d | KB_HARDWARE_KEY)
+#define K_E (KEY_USB_E_e | KB_HARDWARE_KEY)
+#define K_F (KEY_USB_F_f | KB_HARDWARE_KEY)
+#define K_G (KEY_USB_G_g | KB_HARDWARE_KEY)
+#define K_H (KEY_USB_H_h | KB_HARDWARE_KEY)
+#define K_I (KEY_USB_I_i | KB_HARDWARE_KEY)
+#define K_J (KEY_USB_J_j | KB_HARDWARE_KEY)
+#define K_K (KEY_USB_K_k | KB_HARDWARE_KEY)
+#define K_L (KEY_USB_L_l | KB_HARDWARE_KEY)
+#define K_M (KEY_USB_M_m | KB_HARDWARE_KEY)
+#define K_N (KEY_USB_N_n | KB_HARDWARE_KEY)
+#define K_O (KEY_USB_O_o | KB_HARDWARE_KEY)
+#define K_P (KEY_USB_P_p | KB_HARDWARE_KEY)
+#define K_Q (KEY_USB_Q_q | KB_HARDWARE_KEY)
+#define K_R (KEY_USB_R_r | KB_HARDWARE_KEY)
+#define K_S (KEY_USB_S_s | KB_HARDWARE_KEY)
+#define K_T (KEY_USB_T_t | KB_HARDWARE_KEY)
+#define K_U (KEY_USB_U_u | KB_HARDWARE_KEY)
+#define K_V (KEY_USB_V_v | KB_HARDWARE_KEY)
+#define K_W (KEY_USB_W_w | KB_HARDWARE_KEY)
+#define K_X (KEY_USB_X_x | KB_HARDWARE_KEY)
+#define K_Y (KEY_USB_Y_y | KB_HARDWARE_KEY)
+#define K_Z (KEY_USB_Z_z | KB_HARDWARE_KEY)
 
-// 0xF8 max for 32-byte descriptor
+#define K_1_BANG      (KEY_USB_1_BANG       | KB_HARDWARE_KEY)
+#define K_1           (KEY_USB_1_BANG       | KB_UNSHIFTED_KEY)
+#define K_BANG        (KEY_USB_1_BANG       | KB_SHIFTED_KEY)
+#define K_2_AT        (KEY_USB_2_AT         | KB_HARDWARE_KEY)
+#define K_2           (KEY_USB_2_AT         | KB_UNSHIFTED_KEY)
+#define K_AT          (KEY_USB_2_AT         | KB_SHIFTED_KEY)
+#define K_3_HASH      (KEY_USB_3_HASH       | KB_HARDWARE_KEY)
+#define K_3           (KEY_USB_3_HASH       | KB_UNSHIFTED_KEY)
+#define K_HASH        (KEY_USB_3_HASH       | KB_SHIFTED_KEY)
+#define K_4_DOLLAR    (KEY_USB_4_DOLLAR     | KB_HARDWARE_KEY)
+#define K_4           (KEY_USB_4_DOLLAR     | KB_UNSHIFTED_KEY)
+#define K_DOLLAR      (KEY_USB_4_DOLLAR     | KB_SHIFTED_KEY)
+#define K_5_PERCENT   (KEY_USB_5_PERCENT    | KB_HARDWARE_KEY)
+#define K_5           (KEY_USB_5_PERCENT    | KB_UNSHIFTED_KEY)
+#define K_PERCENT     (KEY_USB_5_PERCENT    | KB_SHIFTED_KEY)
+#define K_6_CARET     (KEY_USB_6_CARET      | KB_HARDWARE_KEY)
+#define K_6           (KEY_USB_6_CARET      | KB_UNSHIFTED_KEY)
+#define K_CARET       (KEY_USB_6_CARET      | KB_SHIFTED_KEY)
+#define K_7_AMPERSAND (KEY_USB_7_AMPERSAND  | KB_HARDWARE_KEY)
+#define K_7           (KEY_USB_7_AMPERSAND  | KB_UNSHIFTED_KEY)
+#define K_AMPERSAND   (KEY_USB_7_AMPERSAND  | KB_SHIFTED_KEY)
+#define K_8_ASTERISK  (KEY_USB_8_ASTERISK   | KB_HARDWARE_KEY)
+#define K_8           (KEY_USB_8_ASTERISK   | KB_UNSHIFTED_KEY)
+#define K_ASTERISK    (KEY_USB_PAD_MULTIPLY | KB_HARDWARE_KEY)
+#define K_9_LPAREN    (KEY_USB_9_LPAREN     | KB_HARDWARE_KEY)
+#define K_9           (KEY_USB_9_LPAREN     | KB_UNSHIFTED_KEY)
+#define K_LPAREN      (KEY_USB_9_LPAREN     | KB_SHIFTED_KEY)
+#define K_0_RPAREN    (KEY_USB_0_RPAREN     | KB_HARDWARE_KEY)
+#define K_0           (KEY_USB_0_RPAREN     | KB_UNSHIFTED_KEY)
+#define K_RPAREN      (KEY_USB_0_RPAREN     | KB_SHIFTED_KEY)
 
-// Firmware-only keys
-#define K_NULL K_RESERVED_NO_EVENT
-#define K_L0_SHIFT 0x100
-#define K_L1_SHIFT 0x101
-#define K_L2_SHIFT 0x102
-#define K_L3_SHIFT 0x103
+#define K_RETURN    (KEY_USB_RETURN    | KB_HARDWARE_KEY)
+#define K_ESC       (KEY_USB_ESCAPE    | KB_HARDWARE_KEY)
+#define K_BACKSPACE (KEY_USB_BACKSPACE | KB_HARDWARE_KEY)
+#define K_TAB       (KEY_USB_TAB       | KB_HARDWARE_KEY)
+#define K_SPACE     (KEY_USB_SPACE     | KB_HARDWARE_KEY)
 
-// Short keys
-#define K_A K_A_a
-#define K_B K_B_b
-#define K_C K_C_c
-#define K_D K_D_d
-#define K_E K_E_e
-#define K_F K_F_f
-#define K_G K_G_g
-#define K_H K_H_h
-#define K_I K_I_i
-#define K_J K_J_j
-#define K_K K_K_k
-#define K_L K_L_l
-#define K_M K_M_m
-#define K_N K_N_n
-#define K_O K_O_o
-#define K_P K_P_p
-#define K_Q K_Q_q
-#define K_R K_R_r
-#define K_S K_S_s
-#define K_T K_T_t
-#define K_U K_U_u
-#define K_V K_V_v
-#define K_W K_W_w
-#define K_X K_X_x
-#define K_Y K_Y_y
-#define K_Z K_Z_z
-#define K_1 K_1_BANG
-#define K_2 K_2_AT
-#define K_3 K_3_HASH
-#define K_4 K_4_DOLLAR
-#define K_5 K_5_PERCENT
-#define K_6 K_6_CARET
-#define K_7 K_7_AMPERSAND
-#define K_8 K_8_ASTERISK
-#define K_9 K_9_LPAREN
-#define K_0 K_0_RPAREN
-#define K_DASH K_DASH_UNDERSCORE
-#define K_EQUAL K_EQUAL_PLUS
-#define K_LBRACKET K_LBRACKET_LBRACE
-#define K_RBRACKET K_RBRACKET_RBRACE
-#define K_BACKSLASH K_BACKSLASH_PIPE
-#define K_SEMICOLON K_SEMICOLON_COLON
-#define K_QUOTE K_QUOTE_DOUBLEQUOTE
-#define K_GRAVE K_GRAVE_TILDE
-#define K_COMMA K_COMMA_LANGLE
-#define K_PERIOD K_PERIOD_RANGLE
-#define K_SLASH K_SLASH_QUESTION
-#define K_NUMLOCK K_PAD_NUMLOCK
-#define K_ESC K_ESCAPE
+#define K_DASH_UNDERSCORE (KEY_USB_DASH_UNDERSCORE   | KB_HARDWARE_KEY)
+#define K_DASH            (KEY_USB_PAD_MINUS         | KB_HARDWARE_KEY)
+#define K_UNDERSCORE      (KEY_USB_DASH_UNDERSCORE   | KB_SHIFTED_KEY)
+#define K_EQUAL_PLUS      (KEY_USB_EQUAL_PLUS        | KB_HARDWARE_KEY)
+#define K_EQUAL           (KEY_USB_EQUAL_PLUS        | KB_UNSHIFTED_KEY)
+#define K_PLUS            (KEY_USB_PAD_PLUS          | KB_HARDWARE_KEY)
+#define K_LBRACKET_LBRACE (KEY_USB_LBRACKET_LBRACE   | KB_HARDWARE_KEY)
+#define K_LBRACKET        (KEY_USB_LBRACKET_LBRACE   | KB_UNSHIFTED_KEY)
+#define K_LBRACE          (KEY_USB_LBRACKET_LBRACE   | KB_SHIFTED_KEY)
+#define K_RBRACKET_RBRACE (KEY_USB_RBRACKET_RBRACE   | KB_HARDWARE_KEY)
+#define K_RBRACKET        (KEY_USB_RBRACKET_RBRACE   | KB_UNSHIFTED_KEY)
+#define K_RBRACE          (KEY_USB_RBRACKET_RBRACE   | KB_SHIFTED_KEY)
+#define K_BACKSLASH_PIPE  (KEY_USB_BACKSLASH_PIPE    | KB_HARDWARE_KEY)
+#define K_BACKSLASH       (KEY_USB_BACKSLASH_PIPE    | KB_UNSHIFTED_KEY)
+#define K_PIPE            (KEY_USB_BACKSLASH_PIPE    | KB_SHIFTED_KEY)
+#define K_SEMICOLON_COLON (KEY_USB_SEMICOLON_COLON   | KB_HARDWARE_KEY)
+#define K_SEMICOLON       (KEY_USB_SEMICOLON_COLON   | KB_UNSHIFTED_KEY)
+#define K_COLON           (KEY_USB_SEMICOLON_COLON   | KB_SHIFTED_KEY)
+#define K_QUOTE_DOUBLE    (KEY_USB_QUOTE_DOUBLEQUOTE | KB_HARDWARE_KEY)
+#define K_QUOTE           (KEY_USB_QUOTE_DOUBLEQUOTE | KB_UNSHIFTED_KEY)
+#define K_DOUBLEQUOTE     (KEY_USB_QUOTE_DOUBLEQUOTE | KB_SHIFTED_KEY)
+#define K_GRAVE_TILDE     (KEY_USB_GRAVE_TILDE       | KB_HARDWARE_KEY)
+#define K_GRAVE           (KEY_USB_GRAVE_TILDE       | KB_UNSHIFTED_KEY)
+#define K_TILDE           (KEY_USB_GRAVE_TILDE       | KB_SHIFTED_KEY)
+#define K_COMMA_LANGLE    (KEY_USB_COMMA_LANGLE      | KB_HARDWARE_KEY)
+#define K_COMMA           (KEY_USB_COMMA_LANGLE      | KB_UNSHIFTED_KEY)
+#define K_LANGLE          (KEY_USB_COMMA_LANGLE      | KB_SHIFTED_KEY)
+#define K_PERIOD_RANGLE   (KEY_USB_PERIOD_RANGLE     | KB_HARDWARE_KEY)
+#define K_PERIOD          (KEY_USB_PERIOD_RANGLE     | KB_UNSHIFTED_KEY)
+#define K_RANGLE          (KEY_USB_PERIOD_RANGLE     | KB_SHIFTED_KEY)
+#define K_SLASH_QUESTION  (KEY_USB_SLASH_QUESTION    | KB_HARDWARE_KEY)
+#define K_SLASH           (KEY_USB_PAD_DIVIDE        | KB_HARDWARE_KEY)
+#define K_QUESTION        (KEY_USB_SLASH_QUESTION    | KB_SHIFTED_KEY)
+
+#define K_CAPSLOCK    (KEY_USB_CAPSLOCK          | KB_HARDWARE_KEY)
+#define K_NUMLOCK     (KEY_USB_PAD_NUMLOCK       | KB_HARDWARE_KEY)
+#define K_SCROLLLOCK  (KEY_USB_SCROLLLOCK        | KB_HARDWARE_KEY)
+#define K_PRINTSCREEN (KEY_USB_PRINTSCREEN_SYSRQ | KB_HARDWARE_KEY)
+#define K_PAUSE       (KEY_USB_PAUSE_BREAK       | KB_HARDWARE_KEY)
+#define K_INSERT      (KEY_USB_INSERT            | KB_HARDWARE_KEY)
+#define K_DELETE      (KEY_USB_DELETE            | KB_HARDWARE_KEY)
+#define K_HOME        (KEY_USB_HOME              | KB_HARDWARE_KEY)
+#define K_END         (KEY_USB_END               | KB_HARDWARE_KEY)
+#define K_PAGEUP      (KEY_USB_PAGEUP            | KB_HARDWARE_KEY)
+#define K_PAGEDOWN    (KEY_USB_PAGEDOWN          | KB_HARDWARE_KEY)
+#define K_LEFT        (KEY_USB_LEFT              | KB_HARDWARE_KEY)
+#define K_DOWN        (KEY_USB_DOWN              | KB_HARDWARE_KEY)
+#define K_UP          (KEY_USB_UP                | KB_HARDWARE_KEY)
+#define K_RIGHT       (KEY_USB_RIGHT             | KB_HARDWARE_KEY)
+
+#define K_F1  (KEY_USB_F1  | KB_HARDWARE_KEY)
+#define K_F2  (KEY_USB_F2  | KB_HARDWARE_KEY)
+#define K_F3  (KEY_USB_F3  | KB_HARDWARE_KEY)
+#define K_F4  (KEY_USB_F4  | KB_HARDWARE_KEY)
+#define K_F5  (KEY_USB_F5  | KB_HARDWARE_KEY)
+#define K_F6  (KEY_USB_F6  | KB_HARDWARE_KEY)
+#define K_F7  (KEY_USB_F7  | KB_HARDWARE_KEY)
+#define K_F8  (KEY_USB_F8  | KB_HARDWARE_KEY)
+#define K_F9  (KEY_USB_F9  | KB_HARDWARE_KEY)
+#define K_F10 (KEY_USB_F10 | KB_HARDWARE_KEY)
+#define K_F11 (KEY_USB_F11 | KB_HARDWARE_KEY)
+#define K_F12 (KEY_USB_F12 | KB_HARDWARE_KEY)
+#define K_F13 (KEY_USB_F13 | KB_HARDWARE_KEY)
+#define K_F14 (KEY_USB_F14 | KB_HARDWARE_KEY)
+#define K_F15 (KEY_USB_F15 | KB_HARDWARE_KEY)
+#define K_F16 (KEY_USB_F16 | KB_HARDWARE_KEY)
+#define K_F17 (KEY_USB_F17 | KB_HARDWARE_KEY)
+#define K_F18 (KEY_USB_F18 | KB_HARDWARE_KEY)
+#define K_F19 (KEY_USB_F19 | KB_HARDWARE_KEY)
+#define K_F20 (KEY_USB_F20 | KB_HARDWARE_KEY)
+#define K_F21 (KEY_USB_F21 | KB_HARDWARE_KEY)
+#define K_F22 (KEY_USB_F22 | KB_HARDWARE_KEY)
+#define K_F23 (KEY_USB_F23 | KB_HARDWARE_KEY)
+#define K_F24 (KEY_USB_F24 | KB_HARDWARE_KEY)
+
+#define K_LCTRL  (KEY_USB_LCTRL  | KB_HARDWARE_KEY)
+#define K_LSHIFT (KEY_USB_LSHIFT | KB_HARDWARE_KEY)
+#define K_LALT   (KEY_USB_LALT   | KB_HARDWARE_KEY)
+#define K_LGUI   (KEY_USB_LGUI   | KB_HARDWARE_KEY)
+#define K_RCTRL  (KEY_USB_RCTRL  | KB_HARDWARE_KEY)
+#define K_RSHIFT (KEY_USB_RSHIFT | KB_HARDWARE_KEY)
+#define K_RALT   (KEY_USB_RALT   | KB_HARDWARE_KEY)
+#define K_RGUI   (KEY_USB_RGUI   | KB_HARDWARE_KEY)

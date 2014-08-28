@@ -5,7 +5,7 @@ clean:
 	ino clean
 	$(MAKE) -C firmware/Keyboard clean
 
-build: clean
+build:
 	ino build -f="-Ishared/"
 
 firmware:
