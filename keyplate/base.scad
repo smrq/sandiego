@@ -5,8 +5,10 @@ plateGap = 1;
 switchBaseSize = 14.6;
 keySpacing = 19;
 
-rightFingerKeyplate();
-rightThumbKeyplate();
+//rightFingerKeyplate();
+//rightThumbKeyplate();
+//testKeyswitchMount();
+testFourSwitchMount();
 
 
 //--------------------------------------------------------------------------------
@@ -16,6 +18,21 @@ module testKeyswitchMount() {
 	difference() {
 		cube([25,25,plateThickness]);
 		translate([25/2, 25/2, 0]) keyswitch();
+	}
+}
+
+//@make
+module testFourSwitchMount() {
+	assign(ps=keySpacing*2+6) {
+		difference() {
+			cube([ps,ps,plateThickness]);
+			union() {
+				translate([ps/2-keySpacing/2, ps/2-keySpacing/2, 0]) keyswitch();
+				translate([ps/2+keySpacing/2, ps/2-keySpacing/2, 0]) keyswitch();
+				translate([ps/2+keySpacing/2, ps/2+keySpacing/2, 0]) keyswitch();
+				translate([ps/2-keySpacing/2, ps/2+keySpacing/2, 0]) keyswitch();
+			}
+		}
 	}
 }
 
@@ -130,7 +147,7 @@ module keyswitch(keyX=1, keyY=1) {
 		//	cube([baseSize + 2*flapWidth, flapHeight, thickness], center=true);
 
 		%if (showKeyArea) translate([0,0,thickness/2]) cube([keySpacing*keyX, keySpacing*keyY, thickness*2], center=true);
-		%if (showKeycaps) translate([0,0,2.5]) color("gray") keycap(keySpacing*0.9, keyX, keyY);
+		%if (showKeycaps) translate([0,0,2.5]) color("gray") keycap(keySpacing*0.99, keyX, keyY);
 	}
 }
 
