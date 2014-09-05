@@ -5,13 +5,9 @@ plateGap = 1;
 switchBaseSize = 14.6;
 keySpacing = 19;
 
-module everything() {
-	testKeyswitchMount();
-	rightFingerKeyplate();
-	leftFingerKeyplate();
-	rightThumbKeyplate();
-	leftThumbKeyplate();
-}
+rightFingerKeyplate();
+rightThumbKeyplate();
+
 
 //--------------------------------------------------------------------------------
 
@@ -32,9 +28,9 @@ module leftFingerKeyplate() {
 module rightFingerKeyplate() {
 	difference() {
 		translate([30,73,0]) cube([147,113,plateThickness]);
-		translate([0,0,-plateThickness/2]) scale([1,1,2]) {
+		translate([0,0,-plateThickness/2]) {
 			translate([102,110,0]) rightFingers();
-			minkowski() {
+			scale([1,1,2]) minkowski() {
 				union() {
 					cube([109,90,plateThickness]);
 					translate([109,86,0]) cylinder(r=8, h=plateThickness);
@@ -128,10 +124,10 @@ module keyswitch(keyX=1, keyY=1) {
 	
 	translate([0,0,0.75]) {
 		cube([baseSize, baseSize, thickness], center=true);
-		translate([0, (gapBetweenFlaps + flapHeight)/2, 0])
-			cube([baseSize + 2*flapWidth, flapHeight, thickness], center=true);
-		translate([0, -(gapBetweenFlaps + flapHeight)/2, 0])
-			cube([baseSize + 2*flapWidth, flapHeight, thickness], center=true);
+		//translate([0, (gapBetweenFlaps + flapHeight)/2, 0])
+		//	cube([baseSize + 2*flapWidth, flapHeight, thickness], center=true);
+		//translate([0, -(gapBetweenFlaps + flapHeight)/2, 0])
+		//	cube([baseSize + 2*flapWidth, flapHeight, thickness], center=true);
 
 		%if (showKeyArea) translate([0,0,thickness/2]) cube([keySpacing*keyX, keySpacing*keyY, thickness*2], center=true);
 		%if (showKeycaps) translate([0,0,2.5]) color("gray") keycap(keySpacing*0.9, keyX, keyY);
