@@ -18,3 +18,6 @@ firmware/LUFA-140302/*
 !firmware/LUFA-140302/LUFA
 !firmware/Arduino-keyboard-0.3.hex
 !firmware/Arduino-usbserial-uno.hex
+keyplate/*
+!keyplate/base.scad
+!keyplate/makefile
