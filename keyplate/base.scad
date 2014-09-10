@@ -1,9 +1,13 @@
-showKeyArea = true;
-showKeycaps = true;
+showKeyArea = false;
+showKeycaps = false;
 plateThickness = 1.5;
+plateReinforcementThickness = 2;
 plateGap = 1;
 switchBaseSize = 14.6;
+switchOuterBaseSize = 16.1;
 keySpacing = 19;
+keycapSize = 18;
+useSwitchFlaps = false;
 
 //rightFingerKeyplate();
 //rightThumbKeyplate();
@@ -16,7 +20,7 @@ testFourSwitchMount();
 //@make
 module testKeyswitchMount() {
 	difference() {
-		cube([25,25,plateThickness]);
+		cube([25,25,plateThickness + plateReinforcementThickness]);
 		translate([25/2, 25/2, 0]) keyswitch();
 	}
 }
@@ -25,7 +29,7 @@ module testKeyswitchMount() {
 module testFourSwitchMount() {
 	assign(ps=keySpacing*2+6) {
 		difference() {
-			cube([ps,ps,plateThickness]);
+			cube([ps,ps,plateThickness + plateReinforcementThickness]);
 			union() {
 				translate([ps/2-keySpacing/2, ps/2-keySpacing/2, 0]) keyswitch();
 				translate([ps/2+keySpacing/2, ps/2-keySpacing/2, 0]) keyswitch();
@@ -137,22 +141,33 @@ module keyswitch(keyX=1, keyY=1) {
 	flapWidth = 0.6;
 	flapHeight = 3.5;
 	gapBetweenFlaps = 5;
-	thickness = 2;
 	
-	translate([0,0,0.75]) {
-		cube([baseSize, baseSize, thickness], center=true);
-		//translate([0, (gapBetweenFlaps + flapHeight)/2, 0])
-		//	cube([baseSize + 2*flapWidth, flapHeight, thickness], center=true);
-		//translate([0, -(gapBetweenFlaps + flapHeight)/2, 0])
-		//	cube([baseSize + 2*flapWidth, flapHeight, thickness], center=true);
+	assign(thickness=plateReinforcementThickness) {
+		translate([0,0,plateThickness + thickness/2])
+			cube([switchOuterBaseSize, switchOuterBaseSize, thickness], center=true);
+	}
 
+	assign(thickness=plateThickness) {
+		translate([0,0,thickness/2]) {
+			cube([switchBaseSize, switchBaseSize, thickness], center=true);
+			if (useSwitchFlaps) {
+				translate([0, (gapBetweenFlaps + flapHeight)/2, 0])
+					cube([switchBaseSize + 2*flapWidth, flapHeight, thickness], center=true);
+				translate([0, -(gapBetweenFlaps + flapHeight)/2, 0])
+					cube([switchBaseSize + 2*flapWidth, flapHeight, thickness], center=true);
+			}
+		}
+	}
+
+	translate([0,0,0.75]) {
 		%if (showKeyArea) translate([0,0,thickness/2]) cube([keySpacing*keyX, keySpacing*keyY, thickness*2], center=true);
-		%if (showKeycaps) translate([0,0,2.5]) color("gray") keycap(keySpacing*0.99, keyX, keyY);
+		%if (showKeycaps) translate([0,0,2.5]) color("gray") keycap(keyX, keyY);
 	}
 }
 
 // positioned at center X, center Y, positive Z
-module keycap(keyBase, keyX=1, keyY=1) {
+module keycap(keyX=1, keyY=1) {
+	keyBase = keycapSize;
 	keyTop = keyBase*0.7;
 	keyHeight = keyBase*0.5;
 	cornerRounding = 0.1;
