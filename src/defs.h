@@ -11,6 +11,8 @@
 #define PIN_MOSI 3
 #define PIN_SCK 5
 
+#define TWI_BASE_ADDRESS 0x58
+
 #define enableGlobalInterrupts sei
 #define disableGlobalInterrupts cli
 
