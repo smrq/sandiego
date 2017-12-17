@@ -1,20 +1,14 @@
 #include "defs.h"
 #include "led.h"
-#include <util/delay.h>
 
 local volatile enum TransmitState {
 	START_FRAME,
 	LED_FRAME,
 	END_FRAME
 } transmitState = START_FRAME;
-local volatile int transmitIndex = 0;
+local volatile u16 transmitIndex = 0;
 
-local volatile uint8_t a = 0x01;
-local volatile uint8_t r = 0xFF;
-local volatile uint8_t g = 0x80;
-local volatile uint8_t b = 0x00;
-
-local uint32_t colors[] = {
+local volatile u32 ledColors[LED_COUNT] = {
 	0x04FF0000,
 	0x04FFFF00,
 	0x0400FF00,
@@ -27,128 +21,96 @@ local uint32_t colors[] = {
 	0x04FFFFFF
 };
 
-local volatile bool heartbeat = false;
+local void enableSPIInterrupt() {
+	SPCR |= _BV(SPIE);
+}
 
-// local void enableSPIInterrupt() {
-// 	SPCR |= _BV(SPIE);
-// }
+local void disableSPIInterrupt() {
+	SPCR &= ~_BV(SPIE);
+}
 
-// local void disableSPIInterrupt() {
-// 	SPCR &= ~_BV(SPIE);
-// }
+local u8 red(u32 color) {
+	return color >> 16 & 0xFF;
+}
 
-local void beat() {
-	if (heartbeat) {
-		PORTB &= ~_BV(0);
-	} else {
-		PORTB |= _BV(0);
+local u8 green(u32 color) {
+	return color >> 8 & 0xFF;
+}
+
+local u8 blue(u32 color) {
+	return color >> 0 & 0xFF;
+}
+
+local u8 brightness(u32 color) {
+	return color >> 24 & 0x1F;
+}
+
+local void transmitNextByte() {
+	switch (transmitState) {
+		case START_FRAME: {
+			SPDR = 0;
+
+			if (++transmitIndex >= 8) {
+				transmitState = LED_FRAME;
+				transmitIndex = 0;
+			}
+		} break;
+
+		case LED_FRAME: {
+			u16 ledIndex = transmitIndex / 4;
+
+			switch (transmitIndex % 4) {
+				case 0:
+					SPDR = 0xE0 | brightness(ledColors[ledIndex]);
+					break;
+				case 1:
+					SPDR = red(ledColors[ledIndex]);
+					break;
+				case 2:
+					SPDR = blue(ledColors[ledIndex]);
+					break;
+				case 3:
+					SPDR = green(ledColors[ledIndex]);
+					break;
+			}
+
+			if (++transmitIndex > 4 * LED_COUNT)  {
+				transmitState = END_FRAME;
+				transmitIndex = 0;
+			}
+		} break;
+
+		case END_FRAME: {
+			SPDR = 0xFF;
+
+			if (++transmitIndex >= 8) {
+				transmitState = START_FRAME;
+				transmitIndex = 0;
+				disableSPIInterrupt();
+			}
+		} break;
 	}
-	heartbeat = !heartbeat;
-}
-
-// local void transmitNextByte() {
-// 	switch (transmitState) {
-// 		case START_FRAME:
-// 			SPDR = 0;
-
-// 			// if (transmitIndex == 0) {
-// 				beat();
-// 			// }
-
-// 			if (++transmitIndex >= 8) {
-// 				transmitState = LED_FRAME;
-// 				transmitIndex = 0;
-// 			}
-// 			break;
-
-// 		case LED_FRAME:
-// 			switch (transmitIndex % 4) {
-// 				case 0:
-// 					SPDR = 0xE0 | a;
-// 					break;
-// 				case 1:
-// 					SPDR = r;
-// 					break;
-// 				case 2:
-// 					SPDR = b;
-// 					break;
-// 				case 3:
-// 					SPDR = g;
-// 					break;
-// 			}
-
-// 			if (++transmitIndex > 40) { // 10 LEDs for now
-// 				transmitState = END_FRAME;
-// 				transmitIndex = 0;
-// 			}
-// 			break;
-
-// 		case END_FRAME:
-// 			SPDR = 0xFF;
-
-// 			if (++transmitIndex >= 8) {
-// 				transmitState = START_FRAME;
-// 				transmitIndex = 0;
-// 				disableSPIInterrupt();
-// 			}
-// 			break;
-// 	}
-// }
-
-void initializeLeds() {
-	DDRB = _BV(PIN_SS) | _BV(PIN_MOSI) | _BV(PIN_SCK);
-	PORTB &= ~(_BV(PIN_SS) | _BV(PIN_MOSI) | _BV(PIN_SCK));
-	// SPCR = _BV(SPE) | _BV(MSTR) | _BV(CPOL) | _BV(CPHA) | _BV(SPR0);
-	SPCR = _BV(SPE) | _BV(MSTR) | _BV(SPR0);
-	SPSR &= ~_BV(SPI2X);
-
-	// Heartbeat debugging
-	DDRB |= _BV(0); // Output, pin 12 (PB0)
-	PORTB &= ~_BV(0);
-}
-
-local void waitForTransfer() {
-	while (!(SPSR & _BV(SPIF)));
 }
 
 void transmitLeds() {
-	// enableSPIInterrupt();
-	// transmitNextByte();
-
-	for (int i = 0; i < 8; ++i) {
-		SPDR = 0x00;
-		waitForTransfer();
-	}
-
-	for (int i = 0; i < (sizeof(colors) / sizeof(colors[0])); ++i) {
-		SPDR = 0xE0 | (colors[i] >> 24 & 0x1F);
-		waitForTransfer();
-		SPDR = colors[i] >> 16 & 0xFF;
-		waitForTransfer();
-		SPDR = colors[i] >> 0 & 0xFF;
-		waitForTransfer();
-		SPDR = colors[i] >> 8 & 0xFF;
-		waitForTransfer();
-	}
-
-	for (int i = 0; i < 8; ++i) {
-		SPDR = 0xFF;
-		waitForTransfer();
-	}
-
-	beat();
-	_delay_ms(10);
-	beat();
-	_delay_ms(10);
-	beat();
-	_delay_ms(10);
-	beat();
-	_delay_ms(10);
-	beat();
-	_delay_ms(10);
-	beat();
+	enableSPIInterrupt();
+	transmitNextByte();
 }
 
-// ISR(SPI_STC_vect) {
-// 	transmitNextByte();
-// }
+void setLedColor(u8 index, u32 color) {
+	disableGlobalInterrupts();
+	ledColors[index] = color;
+	enableGlobalInterrupts();
+}
+
+void setAllLedColors(u32 *colors) {
+	disableGlobalInterrupts();
+	for (u16 i = 0; i < LED_COUNT; ++i) {
+		ledColors[i] = colors[i];
+	}
+	enableGlobalInterrupts();
+}
+
+ISR(SPI_STC_vect) {
+	transmitNextByte();
+}

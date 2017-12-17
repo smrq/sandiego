@@ -13,3 +13,9 @@
 
 #define enableGlobalInterrupts sei
 #define disableGlobalInterrupts cli
+
+#define LED_COUNT 10
+
+#define u8 uint8_t
+#define u16 uint16_t
+#define u32 uint32_t
