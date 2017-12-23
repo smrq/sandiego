@@ -1,5 +1,8 @@
 #pragma once
 
+#include "defs.h"
+
 void transmitLeds();
-void setLedColor(u8 index, u32 color);
-void setAllLedColors(u32 *colors);
+void setLed(u8 index, u32 color);
+void setAllLeds(u32 color);
+void setLedPattern(u32 *colors);

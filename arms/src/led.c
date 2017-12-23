@@ -1,11 +1,14 @@
 #include "defs.h"
 #include "led.h"
 
+local bool transmitAgain = false;
+
 local volatile enum TransmitState {
+	IDLE,
 	START_FRAME,
 	LED_FRAME,
 	END_FRAME
-} transmitState = START_FRAME;
+} transmitState = IDLE;
 local volatile u16 transmitIndex = 0;
 
 local volatile u32 ledColors[LED_COUNT] = {
@@ -47,65 +50,89 @@ local u8 brightness(u32 color) {
 
 local void transmitNextByte() {
 	switch (transmitState) {
-		case START_FRAME: {
+		case IDLE:
+			// This should never happen.
+			break;
+
+		case START_FRAME:
 			SPDR = 0;
 
 			if (++transmitIndex >= 8) {
 				transmitState = LED_FRAME;
 				transmitIndex = 0;
 			}
-		} break;
 
-		case LED_FRAME: {
-			u16 ledIndex = transmitIndex / 4;
+			break;
 
+		case LED_FRAME:
 			switch (transmitIndex % 4) {
 				case 0:
-					SPDR = 0xE0 | brightness(ledColors[ledIndex]);
+					SPDR = 0xE0 | brightness(ledColors[transmitIndex / 4]);
 					break;
 				case 1:
-					SPDR = red(ledColors[ledIndex]);
+					SPDR = red(ledColors[transmitIndex / 4]);
 					break;
 				case 2:
-					SPDR = blue(ledColors[ledIndex]);
+					SPDR = blue(ledColors[transmitIndex / 4]);
 					break;
 				case 3:
-					SPDR = green(ledColors[ledIndex]);
+					SPDR = green(ledColors[transmitIndex / 4]);
 					break;
 			}
 
-			if (++transmitIndex > 4 * LED_COUNT)  {
+			if (++transmitIndex > 4 * LED_COUNT) {
 				transmitState = END_FRAME;
 				transmitIndex = 0;
 			}
-		} break;
 
-		case END_FRAME: {
+			break;
+
+		case END_FRAME:
 			SPDR = 0xFF;
 
 			if (++transmitIndex >= 8) {
-				transmitState = START_FRAME;
-				transmitIndex = 0;
-				disableSPIInterrupt();
+				if (transmitAgain) {
+					transmitState = START_FRAME;
+					transmitIndex = 0;
+					transmitAgain = false;
+				} else {
+					transmitState = IDLE;
+					disableSPIInterrupt();
+				}
 			}
-		} break;
+
+			break;
 	}
 }
 
 void transmitLeds() {
-	enableSPIInterrupt();
-	transmitNextByte();
+	if (transmitState == IDLE) {
+		transmitState = START_FRAME;
+		transmitIndex = 0;
+		enableSPIInterrupt();
+		transmitNextByte();
+	} else {
+		transmitAgain = true;
+	}
 }
 
-void setLedColor(u8 index, u32 color) {
+void setLed(u8 index, u32 color) {
 	disableGlobalInterrupts();
 	ledColors[index] = color;
 	enableGlobalInterrupts();
 }
 
-void setAllLedColors(u32 *colors) {
+void setAllLeds(u32 color) {
 	disableGlobalInterrupts();
-	for (u16 i = 0; i < LED_COUNT; ++i) {
+	for (u8 i = 0; i < LED_COUNT; ++i) {
+		ledColors[i] = color;
+	}
+	enableGlobalInterrupts();
+}
+
+void setLedPattern(u32 *colors) {
+	disableGlobalInterrupts();
+	for (u8 i = 0; i < LED_COUNT; ++i) {
 		ledColors[i] = colors[i];
 	}
 	enableGlobalInterrupts();
