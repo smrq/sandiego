@@ -15,7 +15,7 @@ BINDIR = bin
 PORT:=$(shell ls /dev/tty.usbmodem* | sed -n '2 p')
 
 DEPFLAGS=-MT $@ -MMD -MP -MF $(DEPDIR)/$*.temp-d
-CFLAGS=-Wall -Wextra -std=gnu11
+CFLAGS=-Wall -Wextra -std=gnu11 -I$(abspath ../shared)
 OPTFLAGS=-O2 -flto
 ARCHFLAGS=-mmcu=$(MCU) -DF_CPU=$(CPU)
 
@@ -33,13 +33,13 @@ OBJECTS = $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 all: $(BINDIR)/$(TARGET).hex
 
-$(OBJDIR)/%.o : $(SRCDIR)/%.c
-$(OBJDIR)/%.o : $(SRCDIR)/%.c $(DEPDIR)/%.d
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+$(OBJDIR)/%.o: $(SRCDIR)/%.c $(DEPDIR)/%.d
 	$(COMPILE) $< -o $@
 	$(POSTCOMPILE)
 
 $(OBJDIR)/%.S: $(SRCDIR)/%.c
-$(OBJDIR)/%.S : $(SRCDIR)/%.c $(DEPDIR)/%.d
+$(OBJDIR)/%.S: $(SRCDIR)/%.c $(DEPDIR)/%.d
 	$(COMPILEASM) $< -o $@
 	$(POSTCOMPILE)
 
