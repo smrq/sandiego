@@ -20,8 +20,8 @@ local void setup() {
 	SPSR &= ~_BV(SPI2X);
 
 	// LED Heartbeat
-	DDRD = _BV(0);
-	PORTD &= ~_BV(0);
+	DDRD = 0xFF;
+	PORTD = 0;
 
 	// TWI
 	TWI_receivedData = handleTWIReceivedData;

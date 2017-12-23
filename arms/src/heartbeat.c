@@ -1,14 +1,13 @@
-#include "heartbeat.h"
 #include "defs.h"
+#include "heartbeat.h"
 #include "led.h"
 
-local bool heartbeat = false;
+local u8 heartbeat = 0;
 
 void beat() {
-	if (heartbeat) {
-		PORTD &= ~_BV(0);
-	} else {
-		PORTD |= _BV(0);
-	}
-	heartbeat = !heartbeat;
+	PORTD = heartbeat++;
+}
+
+void debug(u8 output) {
+	PORTD = output;
 }
