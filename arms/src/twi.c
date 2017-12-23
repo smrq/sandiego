@@ -2,12 +2,8 @@
 #include <avr/interrupt.h>
 #include <util/twi.h>
 #include "defs.h"
-#include "twi.h"
-
 #include "heartbeat.h"
-
-void (*TWI_requestedData)(u8 *dest, u8 *length);
-void (*TWI_receivedData)(u8 *src, u8 length);
+#include "twi.h"
 
 local u8 messageBuffer[TWI_BUFFER_SIZE];
 local u8 messageSize = 0;
@@ -36,9 +32,6 @@ void TWI_init(u8 address, bool acceptGeneral) {
 	*/
 	TWAR = address << 1 | acceptGeneral;
 
-	// TODO: Pretty sure this isn't necessary.
-	TWDR = 0xFF;
-
 	// Set bit rate prescaler to 1
 	TWSR &= ~(_BV(TWPS0) | _BV(TWPS1));
 
@@ -48,22 +41,18 @@ void TWI_init(u8 address, bool acceptGeneral) {
 ISR(TWI_vect) {
 	static u8 bufferIndex;
 
-	switch (TWSR) {
-		case TW_NO_INFO:
-			break;
-
+	switch (TW_STATUS) {
 		// Slave receive mode
-		case TW_SR_SLA_ACK:
-		case TW_SR_GCALL_ACK:
-		case TW_SR_ARB_LOST_SLA_ACK: // This should never happen because we are never a master
-		case TW_SR_ARB_LOST_GCALL_ACK: // This should never happen because we are never a master
-			beat();
+		case TW_SR_SLA_ACK: // 0x60
+		case TW_SR_GCALL_ACK: // 0x70
+		case TW_SR_ARB_LOST_SLA_ACK: // 0x68  This should never happen because we are never a master
+		case TW_SR_ARB_LOST_GCALL_ACK: // 0x78  This should never happen because we are never a master
 			bufferIndex = 0;
 			TWI_listen(true);
 			break;
 
-		case TW_SR_DATA_ACK:
-		case TW_SR_GCALL_DATA_ACK:
+		case TW_SR_DATA_ACK: // 0x80
+		case TW_SR_GCALL_DATA_ACK: // 0x90
 			if (bufferIndex < TWI_BUFFER_SIZE) {
 				messageBuffer[bufferIndex++] = TWDR;
 				TWI_listen(true);
@@ -72,25 +61,20 @@ ISR(TWI_vect) {
 			}
 			break;
 
-		case TW_SR_STOP:
-			TWI_recover(); // TODO: Pretty sure this isn't necessary.
-			if (TWI_receivedData) {
-				TWI_receivedData(messageBuffer, bufferIndex);
-			}
+		case TW_SR_STOP: // 0xA0
+			// This has to go before the receivedData callback.
+			// Perhaps for timing reasons? (We may need to ACK asap.)
 			TWI_listen(true);
+			TWI_receivedData(messageBuffer, bufferIndex);
 			break;
 
 		// Slave transmit mode
-		case TW_ST_SLA_ACK:
-		case TW_ST_ARB_LOST_SLA_ACK: // This should never happen because we are never a master
+		case TW_ST_SLA_ACK: // 0xA8
+		case TW_ST_ARB_LOST_SLA_ACK: // 0xB0  This should never happen because we are never a master
 			bufferIndex = 0;
 
-			if (TWI_requestedData) {
-				messageSize = TWI_BUFFER_SIZE;
-				TWI_requestedData(messageBuffer, &messageSize);
-			} else {
-				messageSize = 0;
-			}
+			messageSize = 0;
+			TWI_requestedData(messageBuffer, &messageSize);
 
 			// Empty messages are not valid
 			if (messageSize == 0) {
@@ -100,25 +84,34 @@ ISR(TWI_vect) {
 
 			/* fall through */
 
-		case TW_ST_DATA_ACK:
+		case TW_ST_DATA_ACK: // 0xB8
 			TWDR = messageBuffer[bufferIndex++];
 			TWI_listen(bufferIndex < messageSize);
 			break;
 
 		// Error cases
-		case TW_ST_DATA_NACK:
-		case TW_ST_LAST_DATA:
-		case TW_SR_DATA_NACK:
-		case TW_SR_GCALL_DATA_NACK:
+		case TW_NO_INFO: // 0xF8
+			debug(0x03);
+			break;
+
+		case TW_ST_DATA_NACK: // 0xC0
+		case TW_ST_LAST_DATA: // 0xC8
+		case TW_SR_DATA_NACK: // 0x88
+		case TW_SR_GCALL_DATA_NACK: // 0x98
+			debug(0xC3);
+
 			/*
+				This will reset the state of the TWI:
+
 				Switched to the not addressed Slave mode; own SLA will be recognized;
 					- ATtiny datasheet, p. 149 (SR) & 152 (ST)
 			*/
 			TWI_listen(true);
 			break;
 
-		case TW_BUS_ERROR: // Bus error due to an illegal START or STOP condition
+		case TW_BUS_ERROR: // 0x00
 		default:
+			debug(0xC7);
 			TWI_recover();
 			break;
 	}
