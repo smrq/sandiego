@@ -57,6 +57,9 @@ include $(wildcard $(patsubst %,$(DEPDIR)/%.d,$(basename $(SOURCES))))
 flash: $(BINDIR)/$(TARGET).hex
 	avrdude -v -p attiny88 -c arduino -P $(PORT) -U flash:w:$<
 
+fuse:
+	avrdude -v -p attiny88 -c arduino -P ${PORT} -U lfuse:w:0xEE:m
+
 clean:
 	rm -rf $(OBJDIR) $(BINDIR) $(DEPDIR)
 
