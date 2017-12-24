@@ -3,10 +3,19 @@
 #include <util/twi.h>
 #include "defs.h"
 #include "heartbeat.h"
+#include "led.h"
 #include "twi.h"
 
 local u8 messageBuffer[TWI_BUFFER_SIZE];
 local u8 messageSize = 0;
+local u8 messageIndex;
+local enum MessageState {
+	IDLE,
+	COMMAND,
+	SET_LED,
+	SET_ALL_LEDS,
+	SET_LED_BANK
+} messageState = IDLE;
 
 local void TWI_listen(bool ack) {
 	TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWINT) | (ack ? _BV(TWEA) : 0);
@@ -39,40 +48,101 @@ void TWI_init(u8 address, bool acceptGeneral) {
 }
 
 ISR(TWI_vect) {
-	static u8 bufferIndex;
-
 	switch (TW_STATUS) {
 		// Slave receive mode
 		case TW_SR_SLA_ACK: // 0x60
 		case TW_SR_GCALL_ACK: // 0x70
 		case TW_SR_ARB_LOST_SLA_ACK: // 0x68  This should never happen because we are never a master
 		case TW_SR_ARB_LOST_GCALL_ACK: // 0x78  This should never happen because we are never a master
-			bufferIndex = 0;
+			messageState = COMMAND;
 			TWI_listen(true);
 			break;
 
 		case TW_SR_DATA_ACK: // 0x80
 		case TW_SR_GCALL_DATA_ACK: // 0x90
-			if (bufferIndex < TWI_BUFFER_SIZE) {
-				messageBuffer[bufferIndex++] = TWDR;
-				TWI_listen(true);
-			} else {
-				TWI_listen(false);
+			switch (messageState) {
+				case IDLE: // This should never happen.
+					debug(0xF3);
+					break;
+
+				case COMMAND:
+					switch (TWDR) {
+						case TWI_CMD_SET_LED:
+							messageSize = 0;
+							messageState = SET_LED;
+							break;
+
+						case TWI_CMD_SET_ALL_LEDS:
+							messageSize = 0;
+							messageState = SET_ALL_LEDS;
+							break;
+
+						case TWI_CMD_SET_LED_BANK:
+							messageSize = 0;
+							messageIndex = 0;
+							messageState = SET_LED_BANK;
+							break;
+
+						default:
+							messageState = IDLE;
+							break;
+					}
+					break;
+
+				case SET_LED:
+					messageBuffer[messageSize++] = TWDR;
+					if (messageSize == 5) {
+						u8 index = messageBuffer[0];
+						u32 color = *(u32 *)(messageBuffer + 1);
+						setLed(index, color);
+						transmitLeds();
+						messageState = IDLE;
+					}
+					break;
+
+				case SET_ALL_LEDS:
+					messageBuffer[messageSize++] = TWDR;
+					if (messageSize == 4) {
+						u32 color = *(u32 *)(messageBuffer);
+						setAllLeds(color);
+						transmitLeds();
+						messageState = IDLE;
+					}
+					break;
+
+				case SET_LED_BANK:
+					messageBuffer[messageSize++] = TWDR;
+					if (messageSize == 6) {
+						bool flush = messageBuffer[0];
+						u8 bank = messageBuffer[1];
+						u8 index = (bank * LED_BANK_SIZE) + messageIndex++;
+						u32 color = *(u32 *)(messageBuffer + 2);
+						setLed(index, color);
+
+						// Start accumulating another u32 color
+						messageSize = 2;
+
+						if ((messageIndex == LED_BANK_SIZE) || (bank * LED_BANK_SIZE + messageIndex == LED_COUNT)) {
+							if (flush) {
+								transmitLeds();
+							}
+							messageState = IDLE;
+						}
+					}
+					break;
 			}
+			TWI_listen(true);
 			break;
 
 		case TW_SR_STOP: // 0xA0
-			// This has to go before the receivedData callback.
-			// Perhaps for timing reasons? (We may need to ACK asap.)
+			messageState = IDLE;
 			TWI_listen(true);
-			TWI_receivedData(messageBuffer, bufferIndex);
 			break;
 
 		// Slave transmit mode
 		case TW_ST_SLA_ACK: // 0xA8
 		case TW_ST_ARB_LOST_SLA_ACK: // 0xB0  This should never happen because we are never a master
-			bufferIndex = 0;
-
+			messageIndex = 0;
 			messageSize = 0;
 			TWI_requestedData(messageBuffer, &messageSize);
 
@@ -85,8 +155,8 @@ ISR(TWI_vect) {
 			/* fall through */
 
 		case TW_ST_DATA_ACK: // 0xB8
-			TWDR = messageBuffer[bufferIndex++];
-			TWI_listen(bufferIndex < messageSize);
+			TWDR = messageBuffer[messageIndex++];
+			TWI_listen(messageIndex < messageSize);
 			break;
 
 		// Error cases

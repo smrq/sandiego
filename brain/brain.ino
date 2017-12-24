@@ -6,72 +6,71 @@ void setup() {
 	Wire.begin();
 }
 
-u8 setLed(u8 index, u32 color) {
-		Wire.beginTransmission(TWI_BASE_ADDRESS);
-		Wire.write(TWI_CMD_SET_LED);
-		Wire.write(index);
-		Wire.write((u8 *)&color, sizeof(color));
-		return Wire.endTransmission();
+void setLed(u8 index, u32 color) {
+	Wire.beginTransmission(TWI_BASE_ADDRESS);
+	Wire.write(TWI_CMD_SET_LED);
+	Wire.write(index);
+	Wire.write((u8 *)&color, sizeof(color));
+	Serial.print(Wire.endTransmission());
 }
 
-u8 setAllLeds(u32 color) {
-		Wire.beginTransmission(TWI_BASE_ADDRESS);
-		Wire.write(TWI_CMD_SET_ALL_LEDS);
-		Wire.write((u8 *)&color, sizeof(color));
-		return Wire.endTransmission();
+void setAllLeds(u32 color) {
+	Wire.beginTransmission(TWI_BASE_ADDRESS);
+	Wire.write(TWI_CMD_SET_ALL_LEDS);
+	Wire.write((u8 *)&color, sizeof(color));
+	Serial.print(Wire.endTransmission());
 }
 
-u8 setLedPattern(u32 *colors) {
+void setLedPattern(u32 *colors) {
+	for (u8 bank = 0; bank < LED_BANKS; ++bank) {
 		Wire.beginTransmission(TWI_BASE_ADDRESS);
-		Wire.write(TWI_CMD_SET_LED_PATTERN);
-		for (u8 i = 0; i < LED_COUNT; ++i) {
-			Wire.write((u8 *)(colors + i), sizeof(colors[0]));
+		Wire.write(TWI_CMD_SET_LED_BANK);
+		Wire.write(bank == LED_BANKS - 1);
+		Wire.write(bank);
+		for (u8 index = bank * LED_BANK_SIZE;
+			index < (bank + 1) * LED_BANK_SIZE && index < LED_COUNT;
+			++index
+		) {
+			Wire.write((u8 *)(colors + index), sizeof(colors[0]));
 		}
-		return Wire.endTransmission();
+		Serial.print(Wire.endTransmission());
+		delay(1);
+	}
 }
 
 void nextLed() {
 	static u8 index = 0;
 
-/*  if (index < 1) {
-		u8 result = setAllLeds(0x1333333);
-		Serial.print(result);
+	if (index < 1) {
+		setAllLeds(0x1000000);
 	}
 	else if (index < 11) {
-		u8 result = setLed(index - 1, 0x1FF3333);
-		Serial.print(result);
+		setLed(index - 1, 0x1FF0000);
 	}
 	else if (index < 21) {
-		u8 result = setLed(index - 11, 0x133FF33);
-		Serial.print(result);
+		setLed(index - 11, 0x100FF00);
 	}
 	else if (index < 31) {
-		u8 result = setLed(index - 21, 0x13333FF);
-		Serial.print(result);
+		setLed(index - 21, 0x1000000);
 	}
 	else {
-*/
-		if (index % 2 == 0) {
+		if (index % 2) {
 			u32 colors[LED_COUNT] = {
 				0x1FF0000, 0x100FF00, 0x1FF0000, 0x100FF00, 0x1FF0000, 0x100FF00, 0x1FF0000, 0x100FF00, 0x1FF0000, 0x100FF00
 			};
-			u8 result = setLedPattern(colors);
-			Serial.print(result);
+			setLedPattern(colors);
 		} else {
 			u32 colors[LED_COUNT] = {
 				0x100FF00, 0x1FF0000, 0x100FF00, 0x1FF0000, 0x100FF00, 0x1FF0000, 0x100FF00, 0x1FF0000, 0x100FF00, 0x1FF0000
 			};
-			u8 result = setLedPattern(colors);
-			Serial.print(result);
+			setLedPattern(colors);
 		}
-/*
 	}
-*/
 
-	index = (index + 1) % 2;
+	index = (index + 1) % 48;
 }
 
 void loop() {
 	nextLed();
-	delay(500);
+	delay(100);
 }

@@ -117,25 +117,13 @@ void transmitLeds() {
 }
 
 void setLed(u8 index, u32 color) {
-	disableGlobalInterrupts();
 	ledColors[index] = color;
-	enableGlobalInterrupts();
 }
 
 void setAllLeds(u32 color) {
-	disableGlobalInterrupts();
 	for (u8 i = 0; i < LED_COUNT; ++i) {
 		ledColors[i] = color;
 	}
-	enableGlobalInterrupts();
-}
-
-void setLedPattern(u32 *colors) {
-	disableGlobalInterrupts();
-	for (u8 i = 0; i < LED_COUNT; ++i) {
-		ledColors[i] = colors[i];
-	}
-	enableGlobalInterrupts();
 }
 
 ISR(SPI_STC_vect) {
