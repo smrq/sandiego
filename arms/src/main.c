@@ -1,4 +1,3 @@
-#include <util/delay.h>
 #include "defs.h"
 #include "heartbeat.h"
 #include "led.h"
@@ -36,7 +35,7 @@ local void loop() {
 	// Poll keyswitches
 }
 
-int main(void) {
+int main() {
 	setup();
 
 	while (1) {

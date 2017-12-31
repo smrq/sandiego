@@ -122,7 +122,10 @@ ISR(TWI_vect) {
 						// Start accumulating another u32 color
 						messageSize = 2;
 
-						if ((messageIndex == LED_BANK_SIZE) || (bank * LED_BANK_SIZE + messageIndex == LED_COUNT)) {
+						if (
+							(messageIndex == LED_BANK_SIZE) ||
+							(bank * LED_BANK_SIZE + messageIndex == LED_COUNT)
+						) {
 							if (flush) {
 								transmitLeds();
 							}
