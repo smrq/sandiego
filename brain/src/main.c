@@ -11,7 +11,7 @@ void setup() {
 }
 
 void setLed(u8 index, u32 color) {
-	struct __attribute__((__packed__)) {
+	struct PACKED {
 		u8 command;
 		u8 index;
 		u32 color;
@@ -25,7 +25,7 @@ void setLed(u8 index, u32 color) {
 }
 
 void setAllLeds(u32 color) {
-	struct __attribute__((__packed__)) {
+	struct PACKED {
 		u8 command;
 		u32 color;
 	} message = {
@@ -38,7 +38,7 @@ void setAllLeds(u32 color) {
 
 void setLedPattern(u32 *colors) {
 	for (u8 bank = 0; bank < LED_BANKS; ++bank) {
-		struct __attribute__((__packed__)) {
+		struct PACKED {
 			u8 command;
 			bool flush;
 			u8 bank;
