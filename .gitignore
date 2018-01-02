@@ -1,4 +1,18 @@
-.DS_Store
+# Build directories
 bin
 dep
 obj
+
+# Temporary KiCad files
+# https://en.wikibooks.org/wiki/Kicad/file_formats
+*.000
+*.bak
+*.bck
+*.dsn
+*.lst
+*.mdc
+*.net
+*.ses
+
+# Mac OSX junk
+.DS_Store
