@@ -3,6 +3,7 @@
 #include <util/twi.h>
 #include "defs.h"
 #include "led.h"
+#include "scan.h"
 #include "twi.h"
 
 local u8 messageBuffer[TWI_BUFFER_SIZE];
@@ -13,7 +14,8 @@ local enum MessageState {
 	COMMAND,
 	SET_LED,
 	SET_ALL_LEDS,
-	SET_LED_BANK
+	SET_LED_BANK,
+	GET_KEY_STATE
 } messageState = IDLE;
 
 local void TWI_listen(bool ack) {
@@ -60,9 +62,6 @@ ISR(TWI_vect) {
 		case TW_SR_DATA_ACK: // 0x80
 		case TW_SR_GCALL_DATA_ACK: // 0x90
 			switch (messageState) {
-				case IDLE: // This should never happen.
-					break;
-
 				case COMMAND:
 					switch (TWDR) {
 						case TWI_CMD_SET_LED:
@@ -81,10 +80,15 @@ ISR(TWI_vect) {
 							messageState = SET_LED_BANK;
 							break;
 
+						case TWI_CMD_GET_KEY_STATE:
+							messageState = GET_KEY_STATE;
+							break;
+
 						default:
 							messageState = IDLE;
 							break;
 					}
+					TWI_listen(true);
 					break;
 
 				case SET_LED:
@@ -96,6 +100,7 @@ ISR(TWI_vect) {
 						transmitLeds();
 						messageState = IDLE;
 					}
+					TWI_listen(true);
 					break;
 
 				case SET_ALL_LEDS:
@@ -106,6 +111,7 @@ ISR(TWI_vect) {
 						transmitLeds();
 						messageState = IDLE;
 					}
+					TWI_listen(true);
 					break;
 
 				case SET_LED_BANK:
@@ -130,9 +136,13 @@ ISR(TWI_vect) {
 							messageState = IDLE;
 						}
 					}
+					TWI_listen(true);
+					break;
+
+				default: // This should never happen.
+					TWI_listen(false);
 					break;
 			}
-			TWI_listen(true);
 			break;
 
 		case TW_SR_STOP: // 0xA0
@@ -144,20 +154,23 @@ ISR(TWI_vect) {
 		case TW_ST_SLA_ACK: // 0xA8
 		case TW_ST_ARB_LOST_SLA_ACK: // 0xB0  This should never happen because we are never a master
 			messageIndex = 0;
-			messageSize = 0;
-			TWI_requestedData(messageBuffer, &messageSize);
-
-			// Empty messages are not valid
-			if (messageSize == 0) {
-				messageSize = 1;
-				messageBuffer[0] = 0;
-			}
-
 			/* fall through */
 
 		case TW_ST_DATA_ACK: // 0xB8
-			TWDR = messageBuffer[messageIndex++];
-			TWI_listen(messageIndex < messageSize);
+			switch (messageState) {
+				case GET_KEY_STATE: {
+					TWDR = getRowState(messageIndex++);
+					if (messageIndex == ROW_COUNT) {
+						messageState = IDLE;
+					}
+					TWI_listen(true);
+					break;
+				}
+
+				default: // This should never happen.
+					TWI_listen(false);
+					break;
+			}
 			break;
 
 		// Error cases

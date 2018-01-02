@@ -45,7 +45,7 @@ void TWI_transmit(u8 address, u8 *buffer, u8 length) {
 ISR(TWI_vect) {
 	switch (TW_STATUS) {
 		case TW_START: // 0x08
-		case TW_REP_START: // 0x10  This should never happen because we do not use repeat starts
+		// case TW_REP_START: // 0x10  This should never happen because we do not use repeat starts
 			messageIndex = 0;
 			TWDR = (messageRecipient << 1) | TW_WRITE;
 			TWI_continue();

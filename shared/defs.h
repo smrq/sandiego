@@ -9,20 +9,22 @@
 #define disableGlobalInterrupts cli
 
 #define PACKED __attribute__((__packed__))
+#define UNUSED __attribute__ ((unused))
+#define NOP() asm("nop")
 
 #define u8 uint8_t
 #define u16 uint16_t
 #define u32 uint32_t
 
-#define PIN_SS 2
-#define PIN_MOSI 3
-#define PIN_SCK 5
-
 #define TWI_BASE_ADDRESS 0x58
 #define TWI_CMD_SET_LED 0x10
-#define TWI_CMD_SET_ALL_LEDS 0x11
-#define TWI_CMD_SET_LED_BANK 0x12
+#define TWI_CMD_SET_ALL_LEDS 0x20
+#define TWI_CMD_SET_LED_BANK 0x30
+#define TWI_CMD_GET_KEY_STATE 0x40
 
 #define LED_COUNT 10
 #define LED_BANK_SIZE 4
 #define LED_BANKS 3
+
+#define ROW_COUNT 5
+#define COL_COUNT 7
