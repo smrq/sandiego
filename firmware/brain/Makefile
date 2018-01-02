@@ -1,4 +1,4 @@
-TARGET=main
+TARGET=brain
 MCU=atmega32u4
 CPU=2000000
 

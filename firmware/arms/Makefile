@@ -1,4 +1,4 @@
-TARGET=main
+TARGET=arms
 MCU=attiny88
 CPU=8000000
 

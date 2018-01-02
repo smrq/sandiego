@@ -6,9 +6,9 @@
 #include "scan.h"
 #include "twi.h"
 
-local u8 messageBuffer[TWI_BUFFER_SIZE];
+local u8 messageBuffer[TWI_BUFFER_SIZE] = { 0 };
 local u8 messageSize = 0;
-local u8 messageIndex;
+local u8 messageIndex = 0;
 local enum MessageState {
 	IDLE,
 	COMMAND,

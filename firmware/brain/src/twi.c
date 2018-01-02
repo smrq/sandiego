@@ -5,7 +5,7 @@
 #include "defs.h"
 #include "twi.h"
 
-local u8 messageBuffer[TWI_BUFFER_SIZE];
+local u8 messageBuffer[TWI_BUFFER_SIZE] = { 0 };
 local u8 messageSize = 0;
 local u8 messageRecipient = 0;
 local u8 messageIndex = 0;
