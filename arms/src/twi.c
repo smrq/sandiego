@@ -2,7 +2,6 @@
 #include <avr/interrupt.h>
 #include <util/twi.h>
 #include "defs.h"
-#include "heartbeat.h"
 #include "led.h"
 #include "twi.h"
 
@@ -62,7 +61,6 @@ ISR(TWI_vect) {
 		case TW_SR_GCALL_DATA_ACK: // 0x90
 			switch (messageState) {
 				case IDLE: // This should never happen.
-					debug(0xF3);
 					break;
 
 				case COMMAND:
@@ -164,15 +162,12 @@ ISR(TWI_vect) {
 
 		// Error cases
 		case TW_NO_INFO: // 0xF8
-			debug(0x03);
 			break;
 
 		case TW_ST_DATA_NACK: // 0xC0
 		case TW_ST_LAST_DATA: // 0xC8
 		case TW_SR_DATA_NACK: // 0x88
 		case TW_SR_GCALL_DATA_NACK: // 0x98
-			debug(0xC3);
-
 			/*
 				This will reset the state of the TWI:
 
@@ -184,7 +179,6 @@ ISR(TWI_vect) {
 
 		case TW_BUS_ERROR: // 0x00
 		default:
-			debug(0xC7);
 			TWI_recover();
 			break;
 	}

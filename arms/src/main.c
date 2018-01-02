@@ -1,5 +1,4 @@
 #include "defs.h"
-#include "heartbeat.h"
 #include "led.h"
 #include "main.h"
 #include "twi.h"
@@ -14,10 +13,6 @@ local void setup() {
 	PORTB &= ~(_BV(PIN_SS) | _BV(PIN_MOSI) | _BV(PIN_SCK));
 	SPCR = _BV(SPE) | _BV(MSTR) | _BV(CPOL) | _BV(CPHA) | SPCR_CLOCK_SETTINGS;
 	SPSR = SPSR_CLOCK_SETTINGS;
-
-	// LED Heartbeat
-	DDRD = 0xFF;
-	PORTD = 0;
 
 	/*
 		TWI
