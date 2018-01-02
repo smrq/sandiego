@@ -12,7 +12,7 @@ BINDIR = bin
 PORT:=$(shell ls /dev/tty.usbmodem* | sed -n '2 p')
 
 DEPFLAGS=-MT $@ -MMD -MP -MF $(DEPDIR)/$*.temp-d
-CFLAGS=-Wall -Wextra -std=gnu11 -I$(abspath ../shared)
+CFLAGS=-Wall -Wextra -Werror=implicit-function-declaration -std=gnu11 -I$(abspath ../shared)
 OPTFLAGS=-O2 -flto
 ARCHFLAGS=-mmcu=$(MCU) -DF_CPU=$(CPU)
 
