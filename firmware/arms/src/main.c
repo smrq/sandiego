@@ -13,7 +13,7 @@ local void setup() {
 	// Otherwise, each column will be pulled high by the internal pull-up resistor.
 
 	// Port A
-	// 0-3:   Rows 4-7 (if used: output, normally high; if unused: floating)
+	// 0-3: Rows 4-7 (if used: output, normally high; if unused: floating)
 	PORTA = 0b1111;
 	DDRA =
 		(ROW_COUNT >= 5 ? _BV(0) : 0) |
@@ -28,8 +28,8 @@ local void setup() {
 	// 4:   MISO (floating -- connected only when programming with ISP)
 	// 5:   SCK (output)
 	// 6-7: Unused (floating)
-	PORTB = 0b11010111;
-	DDRB =  0b00101000;
+	PORTB = _BV(0) | _BV(1) | _BV(2) | _BV(4) | _BV(6) | _BV(7);
+	DDRB = _BV(3) | _BV(5);
 
 	// Port C
 	// 0-3: Rows 0-3 (if used: output, normally high; if unused: floating)
@@ -37,17 +37,18 @@ local void setup() {
 	// 5:   SCL (ignored when TWEN bit in TWCR is set; external pull-up)
 	// 6:   RESET (ignored when RSTDISBL fuse is set; external pull-up)
 	// 7:   Heartbeat LED (output)
-	PORTC = 0b00001111;
-	DDRC =  0b10000000 |
+	PORTC = _BV(0) | _BV(1) | _BV(2) | _BV(3);
+	DDRC =
 		(ROW_COUNT >= 1 ? _BV(0) : 0) |
 		(ROW_COUNT >= 2 ? _BV(1) : 0) |
 		(ROW_COUNT >= 3 ? _BV(2) : 0) |
-		(ROW_COUNT >= 4 ? _BV(3) : 0);
+		(ROW_COUNT >= 4 ? _BV(3) : 0) |
+		_BV(7);
 
 	// Port D
 	// 0-7: Columns 0-7 (input, internal pullup)
-	PORTD = 0b11111111;
-	DDRD =  0b00000000;
+	PORTD = 0xFF;
+	DDRD = 0x00;
 
 	SPCR = _BV(SPE) | _BV(MSTR) | _BV(CPOL) | _BV(CPHA) | SPCR_CLOCK_SETTINGS;
 	SPSR = SPSR_CLOCK_SETTINGS;
