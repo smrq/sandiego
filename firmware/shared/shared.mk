@@ -1,9 +1,9 @@
 CC=avr-gcc
 
-SRCDIR = src
-DEPDIR = dep
-OBJDIR = obj
-BINDIR = bin
+SRCDIR=src
+DEPDIR=dep
+OBJDIR=obj
+BINDIR=bin
 
 # NOTE: For whatever reason, the Teensy ArduinoISP seems to change tty every
 # time it's plugged in.  On my system, it seems to always be the second
