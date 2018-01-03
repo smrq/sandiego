@@ -61,6 +61,30 @@ local void setup() {
 
 local void loop() {
 	scan();
+
+	// Keyscanner debugging using LEDs
+	setAllLeds(0x1000000);
+	u32 colors[8] = { 0x1202020, 0x1202020, 0x1202020, 0x1202020, 0x1202020, 0x1202020, 0x1202020, 0x1202020 };
+	static u8 flashing = 0;
+	for (u8 i = 0; i < ROW_COUNT; ++i) {
+		u8 rowState = getRowState(i);
+		for (u8 bit = 0; bit < 8; ++bit) {
+			if (rowState & _BV(bit)) {
+				colors[bit] |=
+					(i == 0 ? 0xFF0000 :
+					i == 1 ? 0x00FF00 :
+					i == 2 ? 0x0000FF :
+					i == 3 ? 0x8000000 :
+					(i == 4 && (++flashing & 0x80)) ? 0xFFFFFF :
+					0);
+			}
+		}
+	}
+	for (u8 i = 0; i < 8; ++i) {
+		setLed(i, colors[i]);
+	}
+	transmitLeds();
+	// END
 }
 
 int main() {
