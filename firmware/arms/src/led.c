@@ -8,21 +8,22 @@ local volatile enum TransmitState {
 	IDLE,
 	START_FRAME,
 	LED_FRAME,
-	END_FRAME
+	END_FRAME,
+	FINISHED
 } transmitState = IDLE;
 local volatile u16 transmitIndex = 0;
 
 local volatile u32 ledColors[LED_COUNT] = {
-	0x04FF0000,
-	0x04FFFF00,
-	0x0400FF00,
-	0x0400FFFF,
-	0x040000FF,
-	0x04FF00FF,
-	0x04FF4444,
-	0x0444FF44,
-	0x044444FF,
-	0x04FFFFFF
+	0x04660000,
+	0x04006600,
+	0x04000066,
+	0x04660000,
+	0x04006600,
+	0x04000066,
+	0x04660000,
+	0x04006600,
+	0x04000066,
+	0x04660000
 };
 
 local const u8 PROGMEM gamma8[] = {
@@ -77,7 +78,7 @@ local void transmitNextByte() {
 		case START_FRAME:
 			SPDR = 0;
 
-			if (++transmitIndex >= 8) {
+			if (++transmitIndex == 8) {
 				transmitState = LED_FRAME;
 				transmitIndex = 0;
 			}
@@ -100,7 +101,7 @@ local void transmitNextByte() {
 					break;
 			}
 
-			if (++transmitIndex > 4 * LED_COUNT) {
+			if (++transmitIndex == 4 * LED_COUNT) {
 				transmitState = END_FRAME;
 				transmitIndex = 0;
 			}
@@ -110,17 +111,21 @@ local void transmitNextByte() {
 		case END_FRAME:
 			SPDR = 0xFF;
 
-			if (++transmitIndex >= 8) {
+			if (++transmitIndex == 8) {
 				if (transmitAgain) {
 					transmitState = START_FRAME;
 					transmitIndex = 0;
 					transmitAgain = false;
 				} else {
-					transmitState = IDLE;
-					disableSPIInterrupt();
+					transmitState = FINISHED;
 				}
 			}
 
+			break;
+
+		case FINISHED:
+			transmitState = IDLE;
+			disableSPIInterrupt();
 			break;
 	}
 }
