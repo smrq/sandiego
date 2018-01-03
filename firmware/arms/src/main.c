@@ -5,8 +5,6 @@
 #include "scan.h"
 #include "twi.h"
 
-void TWI_requestedData(UNUSED u8 *dest, UNUSED u8 *length) { }
-
 local void setup() {
 	// Row pins are configured as outputs that are normally high.
 	// Column pins are configured as inputs with the pull-up resistor enabled.
