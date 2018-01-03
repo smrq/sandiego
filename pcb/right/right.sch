@@ -1,5 +1,4 @@
 EESchema Schematic File Version 4
-LIBS:right-cache
 EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
@@ -26,7 +25,7 @@ $EndSheet
 NoConn ~ 5000 4300
 NoConn ~ 5600 4300
 $Comp
-L basic:+5V #PWR010
+L power:+5V #PWR010
 U 1 1 5A3F6A2D
 P 4800 4000
 F 0 "#PWR010" H 4800 3850 50  0001 C CNN
@@ -37,7 +36,7 @@ F 3 "" H 4800 4000 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:GND #PWR011
+L power:GND #PWR011
 U 1 1 5A3F6A6E
 P 5800 4000
 F 0 "#PWR011" H 5800 3750 50  0001 C CNN
@@ -48,7 +47,7 @@ F 3 "" H 5800 4000 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L basic:PWR_FLAG #FLG04
+L power:PWR_FLAG #FLG04
 U 1 1 5A424761
 P 4800 4000
 F 0 "#FLG04" H 4800 4075 50  0001 C CNN
@@ -59,7 +58,7 @@ F 3 "" H 4800 4000 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L basic:PWR_FLAG #FLG02
+L power:PWR_FLAG #FLG02
 U 1 1 5A42418B
 P 5800 4000
 F 0 "#FLG02" H 5800 4075 50  0001 C CNN
@@ -103,4 +102,5 @@ Wire Wire Line
 	5200 3300 5200 4300
 Wire Wire Line
 	5200 3300 6100 3300
+NoConn ~ 4800 5100
 $EndSCHEMATC

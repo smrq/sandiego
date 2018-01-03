@@ -1,5 +1,4 @@
 EESchema Schematic File Version 4
-LIBS:left-cache
 EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
@@ -24,7 +23,7 @@ F3 "SCL" I L 9300 3200 60
 F4 "RESET" I L 9300 3000 60 
 $EndSheet
 $Comp
-L atmega32u4-au:ATMEGA32U4-AU U1
+L atmel:ATMEGA32U4-AU U1
 U 1 1 5A42392B
 P 4850 3650
 F 0 "U1" H 3900 5350 50  0000 C CNN
@@ -35,7 +34,7 @@ F 3 "" H 5950 4750 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:+5V #PWR01
+L power:+5V #PWR01
 U 1 1 5A4240F9
 P 2000 3300
 F 0 "#PWR01" H 2000 3150 50  0001 C CNN
@@ -46,7 +45,7 @@ F 3 "" H 2000 3300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:PWR_FLAG #FLG02
+L power:PWR_FLAG #FLG02
 U 1 1 5A42418B
 P 2000 3300
 F 0 "#FLG02" H 2000 3375 50  0001 C CNN
@@ -57,7 +56,7 @@ F 3 "" H 2000 3300 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L usb_otg:USB_OTG J1
+L Connector:USB_OTG J1
 U 1 1 5A42424B
 P 1500 3500
 F 0 "J1" H 1300 3950 50  0000 L CNN
@@ -68,7 +67,7 @@ F 3 "" H 1650 3450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:R R1
+L device:R R1
 U 1 1 5A42447E
 P 3550 3450
 F 0 "R1" V 3630 3450 50  0000 C CNN
@@ -79,7 +78,7 @@ F 3 "" H 3550 3450 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L basic:R R2
+L device:R R2
 U 1 1 5A4244E6
 P 3550 3550
 F 0 "R2" V 3630 3550 50  0000 C CNN
@@ -90,7 +89,7 @@ F 3 "" H 3550 3550 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L basic:GND #PWR03
+L power:GND #PWR03
 U 1 1 5A42472F
 P 1800 4100
 F 0 "#PWR03" H 1800 3850 50  0001 C CNN
@@ -101,7 +100,7 @@ F 3 "" H 1800 4100 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:PWR_FLAG #FLG04
+L power:PWR_FLAG #FLG04
 U 1 1 5A424761
 P 1800 4100
 F 0 "#FLG04" H 1800 4175 50  0001 C CNN
@@ -112,7 +111,7 @@ F 3 "" H 1800 4100 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:GND #PWR05
+L power:GND #PWR05
 U 1 1 5A424952
 P 3600 4000
 F 0 "#PWR05" H 3600 3750 50  0001 C CNN
@@ -126,7 +125,7 @@ NoConn ~ 1800 3700
 NoConn ~ 1400 3900
 NoConn ~ 3700 4500
 $Comp
-L basic:Crystal_GND24 16MHz1
+L device:Crystal_GND24 16MHz1
 U 1 1 5A424E8A
 P 2700 2600
 F 0 "16MHz1" H 2750 2800 50  0000 L CNN
@@ -137,7 +136,7 @@ F 3 "" H 2700 2600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:CP1_Small C2
+L device:CP1_Small C2
 U 1 1 5A4251BA
 P 2900 2900
 F 0 "C2" H 2910 2970 50  0000 L CNN
@@ -148,7 +147,7 @@ F 3 "" H 2900 2900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:CP1_Small C1
+L device:CP1_Small C1
 U 1 1 5A425245
 P 2500 2900
 F 0 "C1" H 2510 2970 50  0000 L CNN
@@ -159,7 +158,7 @@ F 3 "" H 2500 2900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:GND #PWR06
+L power:GND #PWR06
 U 1 1 5A42529A
 P 2500 3000
 F 0 "#PWR06" H 2500 2750 50  0001 C CNN
@@ -170,7 +169,7 @@ F 3 "" H 2500 3000 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:GND #PWR07
+L power:GND #PWR07
 U 1 1 5A4252C8
 P 2900 3000
 F 0 "#PWR07" H 2900 2750 50  0001 C CNN
@@ -181,7 +180,7 @@ F 3 "" H 2900 3000 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:GND #PWR08
+L power:GND #PWR08
 U 1 1 5A425B6A
 P 2700 3000
 F 0 "#PWR08" H 2700 2750 50  0001 C CNN
@@ -192,7 +191,7 @@ F 3 "" H 2700 3000 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:GND #PWR09
+L power:GND #PWR09
 U 1 1 5A425BA8
 P 2700 2400
 F 0 "#PWR09" H 2700 2150 50  0001 C CNN
@@ -205,7 +204,7 @@ $EndComp
 NoConn ~ 8500 3900
 NoConn ~ 9100 3900
 $Comp
-L basic:+5V #PWR010
+L power:+5V #PWR010
 U 1 1 5A3F6A2D
 P 8600 3700
 F 0 "#PWR010" H 8600 3550 50  0001 C CNN
@@ -216,7 +215,7 @@ F 3 "" H 8600 3700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:GND #PWR011
+L power:GND #PWR011
 U 1 1 5A3F6A6E
 P 9000 3700
 F 0 "#PWR011" H 9000 3450 50  0001 C CNN
@@ -248,7 +247,7 @@ NoConn ~ 5950 4800
 NoConn ~ 5950 4900
 NoConn ~ 5950 5000
 $Comp
-L basic:CP1_Small C4
+L device:CP1_Small C4
 U 1 1 5A3F6CF3
 P 2200 3000
 F 0 "C4" H 2210 3070 50  0000 L CNN
@@ -259,7 +258,7 @@ F 3 "" H 2200 3000 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L basic:SW_Push SW1
+L Switch:SW_Push SW1
 U 1 1 5A3F7613
 P 3100 1750
 F 0 "SW1" H 3150 1850 50  0000 L CNN
@@ -270,7 +269,7 @@ F 3 "" H 3100 1950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:GND #PWR012
+L power:GND #PWR012
 U 1 1 5A3F97CA
 P 2900 1750
 F 0 "#PWR012" H 2900 1500 50  0001 C CNN
@@ -281,40 +280,29 @@ F 3 "" H 2900 1750 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L avr-isp-6:AVR-ISP-6 CON1
-U 1 1 5A404795
-P 7850 2500
-F 0 "CON1" H 7745 2740 50  0000 C CNN
-F 1 "AVR-ISP-6" H 7585 2270 50  0000 L BNN
-F 2 "AVR-ISP-6" V 7330 2540 50  0001 C CNN
-F 3 "" H 7825 2500 50  0001 C CNN
-	1    7850 2500
-	1    0    0    -1  
-$EndComp
-$Comp
-L basic:GND #PWR013
+L power:GND #PWR013
 U 1 1 5A404967
-P 8300 2600
-F 0 "#PWR013" H 8300 2350 50  0001 C CNN
-F 1 "GND" H 8300 2450 50  0000 C CNN
-F 2 "" H 8300 2600 50  0001 C CNN
-F 3 "" H 8300 2600 50  0001 C CNN
-	1    8300 2600
-	1    0    0    -1  
+P 8200 2900
+F 0 "#PWR013" H 8200 2650 50  0001 C CNN
+F 1 "GND" H 8200 2750 50  0000 C CNN
+F 2 "" H 8200 2900 50  0001 C CNN
+F 3 "" H 8200 2900 50  0001 C CNN
+	1    8200 2900
+	0    -1   -1   0   
 $EndComp
 $Comp
-L basic:+5V #PWR014
+L power:+5V #PWR014
 U 1 1 5A4049BA
-P 8300 2400
-F 0 "#PWR014" H 8300 2250 50  0001 C CNN
-F 1 "+5V" H 8300 2540 50  0000 C CNN
-F 2 "" H 8300 2400 50  0001 C CNN
-F 3 "" H 8300 2400 50  0001 C CNN
-	1    8300 2400
-	1    0    0    -1  
+P 7300 2900
+F 0 "#PWR014" H 7300 2750 50  0001 C CNN
+F 1 "+5V" H 7300 3040 50  0000 C CNN
+F 2 "" H 7300 2900 50  0001 C CNN
+F 3 "" H 7300 2900 50  0001 C CNN
+	1    7300 2900
+	0    -1   -1   0   
 $EndComp
 $Comp
-L basic:GND #PWR015
+L power:GND #PWR015
 U 1 1 5A40AE67
 P 2200 2900
 F 0 "#PWR015" H 2200 2650 50  0001 C CNN
@@ -325,7 +313,7 @@ F 3 "" H 2200 2900 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L basic:CP1_Small C3
+L device:CP1_Small C3
 U 1 1 5A40B5F8
 P 3600 3900
 F 0 "C3" H 3610 3970 50  0000 L CNN
@@ -336,7 +324,7 @@ F 3 "" H 3600 3900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:R R3
+L device:R R3
 U 1 1 5A40BF1D
 P 3500 1250
 F 0 "R3" V 3580 1250 50  0000 C CNN
@@ -347,7 +335,7 @@ F 3 "" H 3500 1250 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:+5V #PWR016
+L power:+5V #PWR016
 U 1 1 5A40C00D
 P 3500 1100
 F 0 "#PWR016" H 3500 950 50  0001 C CNN
@@ -391,30 +379,6 @@ Wire Wire Line
 Wire Wire Line
 	5950 3400 7400 3400
 Wire Wire Line
-	7950 2400 8300 2400
-Wire Wire Line
-	7950 2600 8300 2600
-Wire Wire Line
-	8500 2500 7950 2500
-Wire Wire Line
-	5950 2300 7500 2300
-Wire Wire Line
-	7300 2500 7700 2500
-Wire Wire Line
-	5950 2400 7700 2400
-Wire Wire Line
-	7700 2600 7400 2600
-Wire Wire Line
-	7300 2200 7300 2500
-Wire Wire Line
-	5950 2200 7300 2200
-Wire Wire Line
-	7500 2300 7500 2100
-Wire Wire Line
-	7500 2100 8500 2100
-Wire Wire Line
-	8500 2100 8500 2500
-Wire Wire Line
 	3500 2100 3700 2100
 Wire Wire Line
 	3500 1400 3500 1750
@@ -443,7 +407,7 @@ Wire Wire Line
 Wire Wire Line
 	3600 3700 3700 3700
 $Comp
-L basic:GND #PWR017
+L power:GND #PWR017
 U 1 1 5A40C4CC
 P 4350 5350
 F 0 "#PWR017" H 4350 5100 50  0001 C CNN
@@ -462,11 +426,8 @@ Wire Wire Line
 Connection ~ 3500 1750
 Wire Wire Line
 	8700 1750 8700 3000
-Connection ~ 7400 1750
-Wire Wire Line
-	7400 2600 7400 1750
 $Comp
-L basic:+5V #PWR018
+L power:+5V #PWR018
 U 1 1 5A413885
 P 4750 900
 F 0 "#PWR018" H 4750 750 50  0001 C CNN
@@ -477,7 +438,7 @@ F 3 "" H 4750 900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:CP1_Small C8
+L device:CP1_Small C8
 U 1 1 5A41388B
 P 4950 1000
 F 0 "C8" H 4960 1070 50  0000 L CNN
@@ -488,7 +449,7 @@ F 3 "" H 4950 1000 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L basic:GND #PWR019
+L power:GND #PWR019
 U 1 1 5A413892
 P 4950 900
 F 0 "#PWR019" H 4950 650 50  0001 C CNN
@@ -502,7 +463,7 @@ Wire Wire Line
 	4750 900  4750 1100
 Connection ~ 4750 1100
 $Comp
-L basic:+5V #PWR020
+L power:+5V #PWR020
 U 1 1 5A413905
 P 4550 900
 F 0 "#PWR020" H 4550 750 50  0001 C CNN
@@ -513,7 +474,7 @@ F 3 "" H 4550 900 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L basic:CP1_Small C7
+L device:CP1_Small C7
 U 1 1 5A41390B
 P 4350 1000
 F 0 "C7" H 4360 1070 50  0000 L CNN
@@ -524,7 +485,7 @@ F 3 "" H 4350 1000 50  0001 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L basic:GND #PWR021
+L power:GND #PWR021
 U 1 1 5A413912
 P 4350 900
 F 0 "#PWR021" H 4350 650 50  0001 C CNN
@@ -535,7 +496,7 @@ F 3 "" H 4350 900 50  0001 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L basic:+5V #PWR022
+L power:+5V #PWR022
 U 1 1 5A4139BF
 P 4150 900
 F 0 "#PWR022" H 4150 750 50  0001 C CNN
@@ -546,7 +507,7 @@ F 3 "" H 4150 900 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L basic:CP1_Small C6
+L device:CP1_Small C6
 U 1 1 5A4139C5
 P 3950 1000
 F 0 "C6" H 3960 1070 50  0000 L CNN
@@ -557,7 +518,7 @@ F 3 "" H 3950 1000 50  0001 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L basic:GND #PWR023
+L power:GND #PWR023
 U 1 1 5A4139CB
 P 3950 900
 F 0 "#PWR023" H 3950 650 50  0001 C CNN
@@ -576,7 +537,7 @@ Wire Wire Line
 	4150 1100 3950 1100
 Connection ~ 4150 1100
 $Comp
-L basic:+5V #PWR024
+L power:+5V #PWR024
 U 1 1 5A4142CF
 P 5150 900
 F 0 "#PWR024" H 5150 750 50  0001 C CNN
@@ -587,7 +548,7 @@ F 3 "" H 5150 900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:CP1_Small C9
+L device:CP1_Small C9
 U 1 1 5A4142D5
 P 5350 1000
 F 0 "C9" H 5360 1070 50  0000 L CNN
@@ -598,7 +559,7 @@ F 3 "" H 5350 1000 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L basic:GND #PWR025
+L power:GND #PWR025
 U 1 1 5A4142DB
 P 5350 900
 F 0 "#PWR025" H 5350 650 50  0001 C CNN
@@ -612,7 +573,7 @@ Connection ~ 5150 1100
 Wire Wire Line
 	5350 1100 5150 1100
 $Comp
-L basic:+5V #PWR026
+L power:+5V #PWR026
 U 1 1 5A414382
 P 5550 900
 F 0 "#PWR026" H 5550 750 50  0001 C CNN
@@ -623,7 +584,7 @@ F 3 "" H 5550 900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:CP1_Small C10
+L device:CP1_Small C10
 U 1 1 5A414388
 P 5750 1000
 F 0 "C10" H 5760 1070 50  0000 L CNN
@@ -634,7 +595,7 @@ F 3 "" H 5750 1000 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L basic:GND #PWR027
+L power:GND #PWR027
 U 1 1 5A41438E
 P 5750 900
 F 0 "#PWR027" H 5750 650 50  0001 C CNN
@@ -672,7 +633,7 @@ Wire Wire Line
 Wire Wire Line
 	4400 1500 4400 1850
 $Comp
-L basic:CP1_Small C5
+L device:CP1_Small C5
 U 1 1 5A4146BB
 P 3600 3150
 F 0 "C5" H 3610 3220 50  0000 L CNN
@@ -683,7 +644,7 @@ F 3 "" H 3600 3150 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L basic:GND #PWR028
+L power:GND #PWR028
 U 1 1 5A4146C1
 P 3600 3050
 F 0 "#PWR028" H 3600 2800 50  0001 C CNN
@@ -699,7 +660,7 @@ Wire Wire Line
 Wire Wire Line
 	3400 3300 3600 3300
 $Comp
-L basic:+5V #PWR029
+L power:+5V #PWR029
 U 1 1 5A4148C9
 P 3400 3050
 F 0 "#PWR029" H 3400 2900 50  0001 C CNN
@@ -714,7 +675,7 @@ Wire Wire Line
 Wire Wire Line
 	3600 3300 3600 3250
 $Comp
-L basic:R R4
+L device:R R4
 U 1 1 5A489386
 P 7200 3650
 F 0 "R4" V 7280 3650 50  0000 C CNN
@@ -725,7 +686,7 @@ F 3 "" H 7200 3650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L basic:R R5
+L device:R R5
 U 1 1 5A489418
 P 7400 3650
 F 0 "R5" V 7480 3650 50  0000 C CNN
@@ -740,7 +701,7 @@ Wire Wire Line
 Wire Wire Line
 	7400 3500 7400 3400
 $Comp
-L basic:+5V #PWR030
+L power:+5V #PWR030
 U 1 1 5A489589
 P 7200 3800
 F 0 "#PWR030" H 7200 3650 50  0001 C CNN
@@ -751,7 +712,7 @@ F 3 "" H 7200 3800 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L basic:+5V #PWR031
+L power:+5V #PWR031
 U 1 1 5A489652
 P 7400 3800
 F 0 "#PWR031" H 7400 3650 50  0001 C CNN
@@ -777,10 +738,6 @@ Wire Wire Line
 	2900 2700 2900 2800
 Wire Wire Line
 	3500 1750 3500 2100
-Wire Wire Line
-	3500 1750 7400 1750
-Wire Wire Line
-	7400 1750 8700 1750
 Wire Wire Line
 	4750 1100 4750 1850
 Wire Wire Line
@@ -824,4 +781,32 @@ Wire Wire Line
 	8800 3200 9300 3200
 Connection ~ 8800 3300
 NoConn ~ 8300 4700
+$Comp
+L atmel:AVR-ISP-6 CON1
+U 1 1 5A4C5D31
+P 7800 2800
+F 0 "CON1" V 7526 2850 50  0000 C CNN
+F 1 "AVR-ISP-6" V 7435 2850 50  0000 C CNN
+F 2 "" V 7550 2850 50  0001 C CNN
+F 3 "" H 6525 2250 50  0001 C CNN
+	1    7800 2800
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	5950 2400 7600 2400
+Wire Wire Line
+	7700 2300 7700 2400
+Wire Wire Line
+	5950 2300 7700 2300
+Wire Wire Line
+	7800 2200 7800 2400
+Wire Wire Line
+	5950 2200 7800 2200
+Wire Wire Line
+	7900 2400 7900 1750
+Connection ~ 7900 1750
+Wire Wire Line
+	7900 1750 8700 1750
+Wire Wire Line
+	3500 1750 7900 1750
 $EndSCHEMATC
