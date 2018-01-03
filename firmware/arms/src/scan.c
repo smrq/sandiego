@@ -33,9 +33,9 @@ void scan() {
 		// Rows 0-3: PINC0..PINC3
 		// Rows 4-7: PINA0..PINA3
 		if (row < 4) {
-			PORTC |= _BV(row);
+			PORTC &= ~_BV(row);
 		} else {
-			PORTA |= _BV(row % 4);
+			PORTA &= ~_BV(row % 4);
 		}
 
 		/*
@@ -51,7 +51,7 @@ void scan() {
 		}
 
 		if (row < 4) {
-			PORTC &= ~_BV(row);
+			PORTC |= _BV(row);
 		} else {
 			PORTA |= _BV(row % 4);
 		}
