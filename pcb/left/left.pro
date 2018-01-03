@@ -1,4 +1,4 @@
-update=Tuesday, January 02, 2018 'PMt' 05:41:21 PM
+update=Tuesday, January 02, 2018 'PMt' 06:13:06 PM
 version=1
 last_client=kicad
 [general]
@@ -29,12 +29,4 @@ version=1
 NetIExt=net
 [eeschema]
 version=1
-LibDir=../schematics
-[eeschema/libraries]
-LibName1=../schematics/apa102
-LibName2=../schematics/atmega32u4-au
-LibName3=../schematics/attiny88
-LibName4=../schematics/avr-isp-6
-LibName5=../schematics/basic
-LibName6=../schematics/rj11
-LibName7=../schematics/usb_otg
+LibDir=

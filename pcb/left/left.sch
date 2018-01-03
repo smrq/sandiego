@@ -1,12 +1,6 @@
-EESchema Schematic File Version 2
-LIBS:apa102
-LIBS:atmega32u4-au
-LIBS:attiny88
-LIBS:avr-isp-6
-LIBS:basic
-LIBS:rj11
-LIBS:usb_otg
-EELAYER 25 0
+EESchema Schematic File Version 4
+LIBS:left-cache
+EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -21,16 +15,16 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Sheet
-S 9100 2800 600  800 
+S 9300 2800 600  800 
 U 59E157CB
 F0 "KeyMatrix" 60
 F1 "../shared/keymatrix.sch" 60
-F2 "SDA" I L 9100 3400 60 
-F3 "SCL" I L 9100 3200 60 
-F4 "RESET" I L 9100 3000 60 
+F2 "SDA" I L 9300 3400 60 
+F3 "SCL" I L 9300 3200 60 
+F4 "RESET" I L 9300 3000 60 
 $EndSheet
 $Comp
-L ATMEGA32U4-AU U1
+L atmega32u4-au:ATMEGA32U4-AU U1
 U 1 1 5A42392B
 P 4850 3650
 F 0 "U1" H 3900 5350 50  0000 C CNN
@@ -41,7 +35,7 @@ F 3 "" H 5950 4750 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR01
+L basic:+5V #PWR01
 U 1 1 5A4240F9
 P 2000 3300
 F 0 "#PWR01" H 2000 3150 50  0001 C CNN
@@ -52,7 +46,7 @@ F 3 "" H 2000 3300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L PWR_FLAG #FLG02
+L basic:PWR_FLAG #FLG02
 U 1 1 5A42418B
 P 2000 3300
 F 0 "#FLG02" H 2000 3375 50  0001 C CNN
@@ -63,7 +57,7 @@ F 3 "" H 2000 3300 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L USB_OTG J1
+L usb_otg:USB_OTG J1
 U 1 1 5A42424B
 P 1500 3500
 F 0 "J1" H 1300 3950 50  0000 L CNN
@@ -74,7 +68,7 @@ F 3 "" H 1650 3450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R1
+L basic:R R1
 U 1 1 5A42447E
 P 3550 3450
 F 0 "R1" V 3630 3450 50  0000 C CNN
@@ -85,7 +79,7 @@ F 3 "" H 3550 3450 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L R R2
+L basic:R R2
 U 1 1 5A4244E6
 P 3550 3550
 F 0 "R2" V 3630 3550 50  0000 C CNN
@@ -96,7 +90,7 @@ F 3 "" H 3550 3550 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L GND #PWR03
+L basic:GND #PWR03
 U 1 1 5A42472F
 P 1800 4100
 F 0 "#PWR03" H 1800 3850 50  0001 C CNN
@@ -107,7 +101,7 @@ F 3 "" H 1800 4100 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L PWR_FLAG #FLG04
+L basic:PWR_FLAG #FLG04
 U 1 1 5A424761
 P 1800 4100
 F 0 "#FLG04" H 1800 4175 50  0001 C CNN
@@ -118,7 +112,7 @@ F 3 "" H 1800 4100 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR05
+L basic:GND #PWR05
 U 1 1 5A424952
 P 3600 4000
 F 0 "#PWR05" H 3600 3750 50  0001 C CNN
@@ -132,7 +126,7 @@ NoConn ~ 1800 3700
 NoConn ~ 1400 3900
 NoConn ~ 3700 4500
 $Comp
-L Crystal_GND24 16MHz1
+L basic:Crystal_GND24 16MHz1
 U 1 1 5A424E8A
 P 2700 2600
 F 0 "16MHz1" H 2750 2800 50  0000 L CNN
@@ -143,7 +137,7 @@ F 3 "" H 2700 2600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CP1_Small C2
+L basic:CP1_Small C2
 U 1 1 5A4251BA
 P 2900 2900
 F 0 "C2" H 2910 2970 50  0000 L CNN
@@ -154,7 +148,7 @@ F 3 "" H 2900 2900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CP1_Small C1
+L basic:CP1_Small C1
 U 1 1 5A425245
 P 2500 2900
 F 0 "C1" H 2510 2970 50  0000 L CNN
@@ -165,7 +159,7 @@ F 3 "" H 2500 2900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR06
+L basic:GND #PWR06
 U 1 1 5A42529A
 P 2500 3000
 F 0 "#PWR06" H 2500 2750 50  0001 C CNN
@@ -176,7 +170,7 @@ F 3 "" H 2500 3000 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR07
+L basic:GND #PWR07
 U 1 1 5A4252C8
 P 2900 3000
 F 0 "#PWR07" H 2900 2750 50  0001 C CNN
@@ -187,7 +181,7 @@ F 3 "" H 2900 3000 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR08
+L basic:GND #PWR08
 U 1 1 5A425B6A
 P 2700 3000
 F 0 "#PWR08" H 2700 2750 50  0001 C CNN
@@ -198,7 +192,7 @@ F 3 "" H 2700 3000 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR09
+L basic:GND #PWR09
 U 1 1 5A425BA8
 P 2700 2400
 F 0 "#PWR09" H 2700 2150 50  0001 C CNN
@@ -208,21 +202,10 @@ F 3 "" H 2700 2400 50  0001 C CNN
 	1    2700 2400
 	-1   0    0    1   
 $EndComp
-$Comp
-L RJ11 J2
-U 1 1 5A3F6551
-P 8700 4350
-F 0 "J2" H 8900 4850 60  0000 C CNN
-F 1 "RJ11" H 8550 4850 60  0000 C CNN
-F 2 "" H 8700 4350 60  0001 C CNN
-F 3 "" H 8700 4350 60  0001 C CNN
-	1    8700 4350
-	1    0    0    1   
-$EndComp
 NoConn ~ 8500 3900
-NoConn ~ 9000 3900
+NoConn ~ 9100 3900
 $Comp
-L +5V #PWR010
+L basic:+5V #PWR010
 U 1 1 5A3F6A2D
 P 8600 3700
 F 0 "#PWR010" H 8600 3550 50  0001 C CNN
@@ -233,14 +216,14 @@ F 3 "" H 8600 3700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR011
+L basic:GND #PWR011
 U 1 1 5A3F6A6E
-P 8900 3700
-F 0 "#PWR011" H 8900 3450 50  0001 C CNN
-F 1 "GND" H 8900 3550 50  0000 C CNN
-F 2 "" H 8900 3700 50  0001 C CNN
-F 3 "" H 8900 3700 50  0001 C CNN
-	1    8900 3700
+P 9000 3700
+F 0 "#PWR011" H 9000 3450 50  0001 C CNN
+F 1 "GND" H 9000 3550 50  0000 C CNN
+F 2 "" H 9000 3700 50  0001 C CNN
+F 3 "" H 9000 3700 50  0001 C CNN
+	1    9000 3700
 	-1   0    0    1   
 $EndComp
 NoConn ~ 5950 2100
@@ -265,7 +248,7 @@ NoConn ~ 5950 4800
 NoConn ~ 5950 4900
 NoConn ~ 5950 5000
 $Comp
-L CP1_Small C4
+L basic:CP1_Small C4
 U 1 1 5A3F6CF3
 P 2200 3000
 F 0 "C4" H 2210 3070 50  0000 L CNN
@@ -276,7 +259,7 @@ F 3 "" H 2200 3000 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L SW_Push SW1
+L basic:SW_Push SW1
 U 1 1 5A3F7613
 P 3100 1750
 F 0 "SW1" H 3150 1850 50  0000 L CNN
@@ -287,7 +270,7 @@ F 3 "" H 3100 1950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR012
+L basic:GND #PWR012
 U 1 1 5A3F97CA
 P 2900 1750
 F 0 "#PWR012" H 2900 1500 50  0001 C CNN
@@ -298,7 +281,7 @@ F 3 "" H 2900 1750 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L AVR-ISP-6 CON1
+L avr-isp-6:AVR-ISP-6 CON1
 U 1 1 5A404795
 P 7850 2500
 F 0 "CON1" H 7745 2740 50  0000 C CNN
@@ -309,7 +292,7 @@ F 3 "" H 7825 2500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR013
+L basic:GND #PWR013
 U 1 1 5A404967
 P 8300 2600
 F 0 "#PWR013" H 8300 2350 50  0001 C CNN
@@ -320,7 +303,7 @@ F 3 "" H 8300 2600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR014
+L basic:+5V #PWR014
 U 1 1 5A4049BA
 P 8300 2400
 F 0 "#PWR014" H 8300 2250 50  0001 C CNN
@@ -331,7 +314,7 @@ F 3 "" H 8300 2400 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR015
+L basic:GND #PWR015
 U 1 1 5A40AE67
 P 2200 2900
 F 0 "#PWR015" H 2200 2650 50  0001 C CNN
@@ -342,7 +325,7 @@ F 3 "" H 2200 2900 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L CP1_Small C3
+L basic:CP1_Small C3
 U 1 1 5A40B5F8
 P 3600 3900
 F 0 "C3" H 3610 3970 50  0000 L CNN
@@ -353,7 +336,7 @@ F 3 "" H 3600 3900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R3
+L basic:R R3
 U 1 1 5A40BF1D
 P 3500 1250
 F 0 "R3" V 3580 1250 50  0000 C CNN
@@ -364,7 +347,7 @@ F 3 "" H 3500 1250 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR016
+L basic:+5V #PWR016
 U 1 1 5A40C00D
 P 3500 1100
 F 0 "#PWR016" H 3500 950 50  0001 C CNN
@@ -374,10 +357,6 @@ F 3 "" H 3500 1100 50  0001 C CNN
 	1    3500 1100
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	9000 3300 9000 3200
-Wire Wire Line
-	9000 3200 9100 3200
 Connection ~ 4900 5250
 Connection ~ 4800 5250
 Connection ~ 4700 5250
@@ -386,9 +365,9 @@ Connection ~ 1800 4100
 Wire Wire Line
 	2550 2600 2500 2600
 Wire Wire Line
-	2500 2150 2500 2800
+	2500 2150 2500 2600
 Wire Wire Line
-	2900 2600 2900 2800
+	2900 2600 2900 2700
 Wire Wire Line
 	2500 2150 2900 2150
 Wire Wire Line
@@ -398,22 +377,19 @@ Wire Wire Line
 Connection ~ 2500 2600
 Wire Wire Line
 	2700 2800 2700 3000
-Connection ~ 8700 3300
-Connection ~ 8800 3400
+Connection ~ 8900 3400
 Wire Wire Line
 	8600 3700 8600 3900
 Wire Wire Line
-	8900 3900 8900 3700
+	9000 3900 9000 3700
 Wire Wire Line
-	8800 3400 8800 3900
+	8900 3400 8900 3900
 Wire Wire Line
-	8700 3300 8700 3900
+	8800 3300 8800 3900
 Wire Wire Line
-	5950 3300 9000 3300
+	5950 3300 7200 3300
 Wire Wire Line
-	5950 3400 9100 3400
-Wire Wire Line
-	8700 3000 9100 3000
+	5950 3400 7400 3400
 Wire Wire Line
 	7950 2400 8300 2400
 Wire Wire Line
@@ -441,7 +417,7 @@ Wire Wire Line
 Wire Wire Line
 	3500 2100 3700 2100
 Wire Wire Line
-	3500 1400 3500 2100
+	3500 1400 3500 1750
 Wire Wire Line
 	3400 3550 3400 3600
 Wire Wire Line
@@ -461,13 +437,13 @@ Wire Wire Line
 Wire Wire Line
 	1500 3900 1500 4100
 Wire Wire Line
-	4350 5250 5000 5250
+	4350 5250 4450 5250
 Wire Wire Line
 	3600 3800 3600 3700
 Wire Wire Line
 	3600 3700 3700 3700
 $Comp
-L GND #PWR017
+L basic:GND #PWR017
 U 1 1 5A40C4CC
 P 4350 5350
 F 0 "#PWR017" H 4350 5100 50  0001 C CNN
@@ -482,7 +458,7 @@ Wire Wire Line
 Wire Wire Line
 	1500 4100 1800 4100
 Wire Wire Line
-	3300 1750 8700 1750
+	3300 1750 3500 1750
 Connection ~ 3500 1750
 Wire Wire Line
 	8700 1750 8700 3000
@@ -490,7 +466,7 @@ Connection ~ 7400 1750
 Wire Wire Line
 	7400 2600 7400 1750
 $Comp
-L +5V #PWR018
+L basic:+5V #PWR018
 U 1 1 5A413885
 P 4750 900
 F 0 "#PWR018" H 4750 750 50  0001 C CNN
@@ -501,7 +477,7 @@ F 3 "" H 4750 900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CP1_Small C8
+L basic:CP1_Small C8
 U 1 1 5A41388B
 P 4950 1000
 F 0 "C8" H 4960 1070 50  0000 L CNN
@@ -512,7 +488,7 @@ F 3 "" H 4950 1000 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L GND #PWR019
+L basic:GND #PWR019
 U 1 1 5A413892
 P 4950 900
 F 0 "#PWR019" H 4950 650 50  0001 C CNN
@@ -523,10 +499,10 @@ F 3 "" H 4950 900 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 Wire Wire Line
-	4750 900  4750 1850
+	4750 900  4750 1100
 Connection ~ 4750 1100
 $Comp
-L +5V #PWR020
+L basic:+5V #PWR020
 U 1 1 5A413905
 P 4550 900
 F 0 "#PWR020" H 4550 750 50  0001 C CNN
@@ -537,7 +513,7 @@ F 3 "" H 4550 900 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L CP1_Small C7
+L basic:CP1_Small C7
 U 1 1 5A41390B
 P 4350 1000
 F 0 "C7" H 4360 1070 50  0000 L CNN
@@ -548,7 +524,7 @@ F 3 "" H 4350 1000 50  0001 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L GND #PWR021
+L basic:GND #PWR021
 U 1 1 5A413912
 P 4350 900
 F 0 "#PWR021" H 4350 650 50  0001 C CNN
@@ -559,7 +535,7 @@ F 3 "" H 4350 900 50  0001 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L +5V #PWR022
+L basic:+5V #PWR022
 U 1 1 5A4139BF
 P 4150 900
 F 0 "#PWR022" H 4150 750 50  0001 C CNN
@@ -570,7 +546,7 @@ F 3 "" H 4150 900 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L CP1_Small C6
+L basic:CP1_Small C6
 U 1 1 5A4139C5
 P 3950 1000
 F 0 "C6" H 3960 1070 50  0000 L CNN
@@ -581,7 +557,7 @@ F 3 "" H 3950 1000 50  0001 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L GND #PWR023
+L basic:GND #PWR023
 U 1 1 5A4139CB
 P 3950 900
 F 0 "#PWR023" H 3950 650 50  0001 C CNN
@@ -600,7 +576,7 @@ Wire Wire Line
 	4150 1100 3950 1100
 Connection ~ 4150 1100
 $Comp
-L +5V #PWR024
+L basic:+5V #PWR024
 U 1 1 5A4142CF
 P 5150 900
 F 0 "#PWR024" H 5150 750 50  0001 C CNN
@@ -611,7 +587,7 @@ F 3 "" H 5150 900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CP1_Small C9
+L basic:CP1_Small C9
 U 1 1 5A4142D5
 P 5350 1000
 F 0 "C9" H 5360 1070 50  0000 L CNN
@@ -622,7 +598,7 @@ F 3 "" H 5350 1000 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L GND #PWR025
+L basic:GND #PWR025
 U 1 1 5A4142DB
 P 5350 900
 F 0 "#PWR025" H 5350 650 50  0001 C CNN
@@ -636,7 +612,7 @@ Connection ~ 5150 1100
 Wire Wire Line
 	5350 1100 5150 1100
 $Comp
-L +5V #PWR026
+L basic:+5V #PWR026
 U 1 1 5A414382
 P 5550 900
 F 0 "#PWR026" H 5550 750 50  0001 C CNN
@@ -647,7 +623,7 @@ F 3 "" H 5550 900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CP1_Small C10
+L basic:CP1_Small C10
 U 1 1 5A414388
 P 5750 1000
 F 0 "C10" H 5760 1070 50  0000 L CNN
@@ -658,7 +634,7 @@ F 3 "" H 5750 1000 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L GND #PWR027
+L basic:GND #PWR027
 U 1 1 5A41438E
 P 5750 900
 F 0 "#PWR027" H 5750 650 50  0001 C CNN
@@ -672,7 +648,7 @@ Connection ~ 5550 1100
 Wire Wire Line
 	5750 1100 5550 1100
 Wire Wire Line
-	5150 900  5150 1400
+	5150 900  5150 1100
 Wire Wire Line
 	5150 1400 5000 1400
 Wire Wire Line
@@ -682,21 +658,21 @@ Wire Wire Line
 Wire Wire Line
 	5100 1500 5550 1500
 Wire Wire Line
-	5550 1500 5550 900 
+	5550 1500 5550 1100
 Wire Wire Line
-	4550 900  4550 1400
+	4550 900  4550 1100
 Wire Wire Line
 	4550 1400 4650 1400
 Wire Wire Line
 	4650 1400 4650 1850
 Wire Wire Line
-	4150 900  4150 1500
+	4150 900  4150 1100
 Wire Wire Line
 	4150 1500 4400 1500
 Wire Wire Line
 	4400 1500 4400 1850
 $Comp
-L CP1_Small C5
+L basic:CP1_Small C5
 U 1 1 5A4146BB
 P 3600 3150
 F 0 "C5" H 3610 3220 50  0000 L CNN
@@ -707,7 +683,7 @@ F 3 "" H 3600 3150 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L GND #PWR028
+L basic:GND #PWR028
 U 1 1 5A4146C1
 P 3600 3050
 F 0 "#PWR028" H 3600 2800 50  0001 C CNN
@@ -719,11 +695,11 @@ F 3 "" H 3600 3050 50  0001 C CNN
 $EndComp
 Connection ~ 3600 3300
 Wire Wire Line
-	1800 3300 2200 3300
+	1800 3300 2000 3300
 Wire Wire Line
-	3400 3300 3700 3300
+	3400 3300 3600 3300
 $Comp
-L +5V #PWR029
+L basic:+5V #PWR029
 U 1 1 5A4148C9
 P 3400 3050
 F 0 "#PWR029" H 3400 2900 50  0001 C CNN
@@ -738,7 +714,7 @@ Wire Wire Line
 Wire Wire Line
 	3600 3300 3600 3250
 $Comp
-L R R4
+L basic:R R4
 U 1 1 5A489386
 P 7200 3650
 F 0 "R4" V 7280 3650 50  0000 C CNN
@@ -749,7 +725,7 @@ F 3 "" H 7200 3650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R5
+L basic:R R5
 U 1 1 5A489418
 P 7400 3650
 F 0 "R5" V 7480 3650 50  0000 C CNN
@@ -761,12 +737,10 @@ F 3 "" H 7400 3650 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	7200 3500 7200 3300
-Connection ~ 7200 3300
 Wire Wire Line
 	7400 3500 7400 3400
-Connection ~ 7400 3400
 $Comp
-L +5V #PWR030
+L basic:+5V #PWR030
 U 1 1 5A489589
 P 7200 3800
 F 0 "#PWR030" H 7200 3650 50  0001 C CNN
@@ -777,7 +751,7 @@ F 3 "" H 7200 3800 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L +5V #PWR031
+L basic:+5V #PWR031
 U 1 1 5A489652
 P 7400 3800
 F 0 "#PWR031" H 7400 3650 50  0001 C CNN
@@ -787,4 +761,67 @@ F 3 "" H 7400 3800 50  0001 C CNN
 	1    7400 3800
 	-1   0    0    1   
 $EndComp
+Wire Wire Line
+	4900 5250 5000 5250
+Wire Wire Line
+	4800 5250 4900 5250
+Wire Wire Line
+	4700 5250 4800 5250
+Wire Wire Line
+	4450 5250 4700 5250
+Wire Wire Line
+	2500 2600 2500 2800
+Wire Wire Line
+	2000 3300 2200 3300
+Wire Wire Line
+	2900 2700 2900 2800
+Wire Wire Line
+	3500 1750 3500 2100
+Wire Wire Line
+	3500 1750 7400 1750
+Wire Wire Line
+	7400 1750 8700 1750
+Wire Wire Line
+	4750 1100 4750 1850
+Wire Wire Line
+	4550 1100 4550 1400
+Wire Wire Line
+	4150 1100 4150 1500
+Wire Wire Line
+	5150 1100 5150 1400
+Wire Wire Line
+	5550 1100 5550 900 
+Wire Wire Line
+	3600 3300 3700 3300
+$Comp
+L Connector:RJ45 J?
+U 1 1 5A4D84B6
+P 8850 4350
+F 0 "J?" H 8412 4298 50  0000 R CNN
+F 1 "RJ45" H 8412 4389 50  0000 R CNN
+F 2 "" H 8850 4350 50  0001 C CNN
+F 3 "" H 8850 4350 50  0001 C CNN
+	1    8850 4350
+	-1   0    0    1   
+$EndComp
+NoConn ~ 9200 3900
+Wire Wire Line
+	7200 3300 8800 3300
+Connection ~ 7200 3300
+Wire Wire Line
+	7400 3400 8900 3400
+Connection ~ 7400 3400
+Wire Wire Line
+	8700 3900 8700 3000
+Connection ~ 8700 3000
+Wire Wire Line
+	8700 3000 9300 3000
+Wire Wire Line
+	8900 3400 9300 3400
+Wire Wire Line
+	8800 3300 8800 3200
+Wire Wire Line
+	8800 3200 9300 3200
+Connection ~ 8800 3300
+NoConn ~ 8300 4700
 $EndSCHEMATC
