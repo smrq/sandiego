@@ -10,7 +10,7 @@ void setup() {
 	enableGlobalInterrupts();
 }
 
-void setLed(u8 index, u32 color) {
+void setLed(u8 address, u8 index, u32 color) {
 	struct PACKED {
 		u8 command;
 		u8 index;
@@ -21,10 +21,10 @@ void setLed(u8 index, u32 color) {
 		.color = color
 	};
 
-	TWI_transmit(TWI_BASE_ADDRESS, (u8 *)&message, sizeof(message));
+	TWI_transmit(address, (u8 *)&message, sizeof(message));
 }
 
-void setAllLeds(u32 color) {
+void setAllLeds(u8 address, u32 color) {
 	struct PACKED {
 		u8 command;
 		u32 color;
@@ -33,10 +33,10 @@ void setAllLeds(u32 color) {
 		.color = color
 	};
 
-	TWI_transmit(TWI_BASE_ADDRESS, (u8 *)&message, sizeof(message));
+	TWI_transmit(address, (u8 *)&message, sizeof(message));
 }
 
-void setLedPattern(u32 *colors) {
+void setLedPattern(u8 address, u32 *colors) {
 	for (u8 bank = 0; bank < LED_BANKS; ++bank) {
 		struct PACKED {
 			u8 command;
@@ -59,7 +59,7 @@ void setLedPattern(u32 *colors) {
 		}
 
 		TWI_transmit(
-			TWI_BASE_ADDRESS,
+			address,
 			(u8 *)&message,
 			sizeof(message) - (sizeof(message.colors[0]) * (LED_BANK_SIZE - i))
 		);
@@ -69,31 +69,32 @@ void setLedPattern(u32 *colors) {
 }
 
 void nextLed() {
+	u8 address = TWI_BASE_ADDRESS;
 	static u8 index = 0;
 
 	if (index < 1) {
-		setAllLeds(0x1000000);
+		setAllLeds(address, 0x1000000);
 	}
 	else if (index < 11) {
-		setLed(index - 1, 0x1FF0000);
+		setLed(address, index - 1, 0x1FF0000);
 	}
 	else if (index < 21) {
-		setLed(index - 11, 0x100FF00);
+		setLed(address, index - 11, 0x100FF00);
 	}
 	else if (index < 31) {
-		setLed(index - 21, 0x10000FF);
+		setLed(address, index - 21, 0x10000FF);
 	}
 	else {
 		if (index % 2) {
 			u32 colors[LED_COUNT] = {
 				0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF
 			};
-			setLedPattern(colors);
+			setLedPattern(address, colors);
 		} else {
 			u32 colors[LED_COUNT] = {
 				0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000
 			};
-			setLedPattern(colors);
+			setLedPattern(address, colors);
 		}
 	}
 
@@ -109,7 +110,7 @@ int main() {
 	setup();
 
 	while(1) {
-		loop();
+		// loop();
 	}
 	__builtin_unreachable();
 }
