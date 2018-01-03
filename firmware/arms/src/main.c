@@ -15,10 +15,13 @@ local void setup() {
 	// Otherwise, each column will be pulled high by the internal pull-up resistor.
 
 	// Port A
-	// 0:   Row 4 (output, normally high)
-	// 1-3: Rows 5-7 (floating -- currently unused)
+	// 0-3:   Rows 4-7 (if used: output, normally high; if unused: floating)
 	PORTA = 0b1111;
-	DDRA =  0b0001;
+	DDRA =
+		(ROW_COUNT >= 5 ? _BV(0) : 0) |
+		(ROW_COUNT >= 6 ? _BV(1) : 0) |
+		(ROW_COUNT >= 7 ? _BV(2) : 0) |
+		(ROW_COUNT >= 8 ? _BV(3) : 0);
 
 	// Port B
 	// 0-1: Address jumpers (either floating or low)
@@ -31,13 +34,17 @@ local void setup() {
 	DDRB =  0b00101000;
 
 	// Port C
-	// 0-3: Rows 0-3 (output, normally high)
+	// 0-3: Rows 0-3 (if used: output, normally high; if unused: floating)
 	// 4:   SDA (ignored when TWEN bit in TWCR is set; external pull-up)
 	// 5:   SCL (ignored when TWEN bit in TWCR is set; external pull-up)
 	// 6:   RESET (ignored when RSTDISBL fuse is set; external pull-up)
 	// 7:   Heartbeat LED (output)
 	PORTC = 0b00001111;
-	DDRC =  0b10001111;
+	DDRC =  0b10000000 |
+		(ROW_COUNT >= 1 ? _BV(0) : 0) |
+		(ROW_COUNT >= 2 ? _BV(1) : 0) |
+		(ROW_COUNT >= 3 ? _BV(2) : 0) |
+		(ROW_COUNT >= 4 ? _BV(3) : 0);
 
 	// Port D
 	// 0-7: Columns 0-7 (input, internal pullup)
