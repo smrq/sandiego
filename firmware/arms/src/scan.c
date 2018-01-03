@@ -1,3 +1,4 @@
+#include <avr/cpufunc.h>
 #include "defs.h"
 #include "scan.h"
 
@@ -43,7 +44,7 @@ void scan() {
 			inserted as indicated in Figure 10-5.
 				- ATtiny datasheet, p. 63
 		*/
-		NOP();
+		_NOP();
 
 		u8 updatedKeys = debounce(&rowState[row], ~PIND);
 		if (__builtin_expect(updatedKeys, 0)) {

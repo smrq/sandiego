@@ -10,7 +10,6 @@
 
 #define PACKED __attribute__((__packed__))
 #define UNUSED __attribute__ ((unused))
-#define NOP() asm("nop")
 
 #define u8 uint8_t
 #define u16 uint16_t
