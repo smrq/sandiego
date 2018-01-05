@@ -67,7 +67,7 @@ local void setup() {
 
 local void loop() {
 	scan();
-
+	/*
 	// Keyscanner debugging using LEDs
 	setAllLeds(0x1000000);
 	u32 colors[8] = { 0x1202020, 0x1202020, 0x1202020, 0x1202020, 0x1202020, 0x1202020, 0x1202020, 0x1202020 };
@@ -91,6 +91,7 @@ local void loop() {
 	}
 	transmitLeds();
 	// END
+	*/
 }
 
 int main() {

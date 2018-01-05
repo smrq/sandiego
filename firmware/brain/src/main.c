@@ -1,4 +1,5 @@
 #include "defs.h"
+#include "leds.h"
 #include "twi.h"
 #include <util/delay.h>
 
@@ -10,33 +11,41 @@ void setup() {
 	enableGlobalInterrupts();
 }
 
-void setLed(u8 address, u8 index, u32 color) {
-	struct PACKED {
-		u8 command;
-		u8 index;
-		u32 color;
-	} message = {
-		.command = TWI_CMD_SET_LED,
-		.index = index,
-		.color = color
-	};
+void nextLed(led_buffer_t *buffer) {
+	static u8 index = 0;
 
-	TWI_transmit(address, (u8 *)&message, sizeof(message));
+	if (index < 1) {
+		writeAllLeds(buffer, 0x1000000);
+	}
+	else if (index < 11) {
+		writeLed(buffer, index - 1, 0x1FF0000);
+	}
+	else if (index < 21) {
+		writeLed(buffer, index - 11, 0x100FF00);
+	}
+	else if (index < 31) {
+		writeLed(buffer, index - 21, 0x10000FF);
+	}
+	else {
+		if (index % 2) {
+			u32 colors[LED_COUNT] = {
+				0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF
+			};
+			writeLedPattern(buffer, colors);
+		} else {
+			u32 colors[LED_COUNT] = {
+				0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000
+			};
+			writeLedPattern(buffer, colors);
+		}
+	}
+
+	index = (index + 1) % 48;
 }
 
-void setAllLeds(u8 address, u32 color) {
-	struct PACKED {
-		u8 command;
-		u32 color;
-	} message = {
-		.command = TWI_CMD_SET_ALL_LEDS,
-		.color = color
-	};
+void transmitLeds(led_buffer_t *buffer, u8 address) {
+	flipLedBuffer(buffer);
 
-	TWI_transmit(address, (u8 *)&message, sizeof(message));
-}
-
-void setLedPattern(u8 address, u32 *colors) {
 	for (u8 bank = 0; bank < LED_BANKS; ++bank) {
 		struct PACKED {
 			u8 command;
@@ -55,7 +64,7 @@ void setLedPattern(u8 address, u32 *colors) {
 			(i < LED_BANK_SIZE) && ((bank * LED_BANK_SIZE) + i < LED_COUNT);
 			++i
 		) {
-			message.colors[i] = colors[(bank * LED_BANK_SIZE) + i];
+			message.colors[i] = readLed(buffer, (bank * LED_BANK_SIZE) + i);
 		}
 
 		TWI_transmit(
@@ -68,41 +77,9 @@ void setLedPattern(u8 address, u32 *colors) {
 	}
 }
 
-void nextLed() {
-	u8 address = TWI_BASE_ADDRESS;
-	static u8 index = 0;
-
-	if (index < 1) {
-		setAllLeds(address, 0x1000000);
-	}
-	else if (index < 11) {
-		setLed(address, index - 1, 0x1FF0000);
-	}
-	else if (index < 21) {
-		setLed(address, index - 11, 0x100FF00);
-	}
-	else if (index < 31) {
-		setLed(address, index - 21, 0x10000FF);
-	}
-	else {
-		if (index % 2) {
-			u32 colors[LED_COUNT] = {
-				0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF
-			};
-			setLedPattern(address, colors);
-		} else {
-			u32 colors[LED_COUNT] = {
-				0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000
-			};
-			setLedPattern(address, colors);
-		}
-	}
-
-	index = (index + 1) % 48;
-}
-
 void loop() {
-	nextLed();
+	nextLed(&leftLeds);
+	transmitLeds(&leftLeds, TWI_BASE_ADDRESS);
 	_delay_ms(100);
 }
 
@@ -110,7 +87,7 @@ int main() {
 	setup();
 
 	while(1) {
-		// loop();
+		loop();
 	}
 	__builtin_unreachable();
 }
