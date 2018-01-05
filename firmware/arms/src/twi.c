@@ -14,7 +14,7 @@ local enum MessageState {
 	COMMAND,
 	SET_LED,
 	SET_ALL_LEDS,
-	SET_LED_BANK,
+	SET_LEDS,
 	GET_KEY_STATE
 } messageState = IDLE;
 
@@ -74,10 +74,10 @@ ISR(TWI_vect) {
 							messageState = SET_ALL_LEDS;
 							break;
 
-						case TWI_CMD_SET_LED_BANK:
+						case TWI_CMD_SET_LEDS:
 							messageSize = 0;
 							messageIndex = 0;
-							messageState = SET_LED_BANK;
+							messageState = SET_LEDS;
 							break;
 
 						case TWI_CMD_GET_KEY_STATE:
@@ -114,25 +114,15 @@ ISR(TWI_vect) {
 					TWI_listen(true);
 					break;
 
-				case SET_LED_BANK:
+				case SET_LEDS:
 					messageBuffer[messageSize++] = TWDR;
-					if (messageSize == 6) {
-						bool flush = messageBuffer[0];
-						u8 bank = messageBuffer[1];
-						u8 index = (bank * LED_BANK_SIZE) + messageIndex++;
-						u32 color = *(u32 *)(messageBuffer + 2);
-						setLed(index, color);
+					if (messageSize == 4) {
+						u32 color = *(u32 *)(messageBuffer);
+						setLed(messageIndex++, color);
+						messageSize = 0;
 
-						// Start accumulating another u32 color
-						messageSize = 2;
-
-						if (
-							(messageIndex == LED_BANK_SIZE) ||
-							(bank * LED_BANK_SIZE + messageIndex == LED_COUNT)
-						) {
-							if (flush) {
-								transmitLeds();
-							}
+						if (messageIndex == LED_COUNT) {
+							transmitLeds();
 							messageState = IDLE;
 						}
 					}

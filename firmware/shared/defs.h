@@ -18,12 +18,10 @@
 #define TWI_BASE_ADDRESS 0x58
 #define TWI_CMD_SET_LED 0x10
 #define TWI_CMD_SET_ALL_LEDS 0x20
-#define TWI_CMD_SET_LED_BANK 0x30
+#define TWI_CMD_SET_LEDS 0x30
 #define TWI_CMD_GET_KEY_STATE 0x40
 
 #define LED_COUNT 10
-#define LED_BANK_SIZE 4
-#define LED_BANKS 3
 
 #define ROW_COUNT 5
 #define COL_COUNT 7

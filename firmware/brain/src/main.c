@@ -46,35 +46,18 @@ void nextLed(led_buffer_t *buffer) {
 void transmitLeds(led_buffer_t *buffer, u8 address) {
 	flipLedBuffer(buffer);
 
-	for (u8 bank = 0; bank < LED_BANKS; ++bank) {
-		struct PACKED {
-			u8 command;
-			bool flush;
-			u8 bank;
-			u32 colors[LED_BANK_SIZE];
-		} message = {
-			.command = TWI_CMD_SET_LED_BANK,
-			.flush = bank == LED_BANKS - 1,
-			.bank = bank
-		};
+	struct PACKED {
+		u8 command;
+		u32 colors[LED_COUNT];
+	} message = {
+		.command = TWI_CMD_SET_LEDS
+	};
 
-		u8 i;
-
-		for (i = 0;
-			(i < LED_BANK_SIZE) && ((bank * LED_BANK_SIZE) + i < LED_COUNT);
-			++i
-		) {
-			message.colors[i] = readLed(buffer, (bank * LED_BANK_SIZE) + i);
-		}
-
-		TWI_transmit(
-			address,
-			(u8 *)&message,
-			sizeof(message) - (sizeof(message.colors[0]) * (LED_BANK_SIZE - i))
-		);
-
-		while (TWI_busy());
+	for (u8 index = 0; index < LED_COUNT; ++index) {
+		message.colors[index] = readLed(buffer, index);
 	}
+
+	TWI_transmit(address, (u8 *)&message, sizeof(message));
 }
 
 void loop() {
