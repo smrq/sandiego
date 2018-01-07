@@ -5,21 +5,21 @@ local volatile u8 state = 0;
 
 local void debug_updateLeds() {
 	if (state & _BV(0)) {
-		PORTC |= _BV(7);
-	} else {
 		PORTC &= ~_BV(7);
+	} else {
+		PORTC |= _BV(7);
 	}
 
 	if (state & _BV(1)) {
-		PORTB |= _BV(6);
-	} else {
 		PORTB &= ~_BV(6);
+	} else {
+		PORTB |= _BV(6);
 	}
 
 	if (state & _BV(2)) {
-		PORTB |= _BV(7);
-	} else {
 		PORTB &= ~_BV(7);
+	} else {
+		PORTB |= _BV(7);
 	}
 }
 

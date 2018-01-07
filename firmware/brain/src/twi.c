@@ -34,12 +34,18 @@ bool TWI_busy() {
 	return busy;
 }
 
-void TWI_transmit(u8 address, u8 *buffer, u8 length) {
+bool TWI_transmit(u8 address, u8 *buffer, u8 length) {
+	if (busy) {
+		return false;
+	}
+
 	busy = true;
 	memcpy(messageBuffer, buffer, length);
 	messageSize = length;
 	messageRecipient = address;
 	TWI_start();
+
+	return true;
 }
 
 ISR(TWI_vect) {

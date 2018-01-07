@@ -3,9 +3,44 @@
 #include "twi.h"
 #include <util/delay.h>
 
+volatile bool shouldRequestKeys = false;
+
 void setup() {
-	DDRD = _BV(6);
-	PORTD &= ~(_BV(6));
+	// Port B
+	// 0:   SS (unused -- floating)
+	// 1-3: SCK, MOSI, MISO (floating -- connected only when programming with ISP)
+	// 4:   Debug LED (output)
+	// 5-7: Unused (floating)
+	PORTB = ~_BV(4); //0xFF;
+	DDRB = _BV(4);
+
+	// Port C
+	// 6-7: Unused (floating)
+	PORTC = _BV(6) | _BV(7);
+	DDRC = 0;
+
+	// Port D
+	// 0:   SCL (ignored when TWEN bit in TWCR is set; external pull-up)
+	// 1:   SDA (ignored when TWEN bit in TWCR is set; external pull-up)
+	// 2:   INT2 (callback interrupt -- input, internal pullup)
+	// 3-6: Unused (floating)
+	PORTD = ~(_BV(0) | _BV(1));
+	DDRD = 0;
+
+	// Port E
+	// 2,6: Unused (floating)
+	PORTE = _BV(2) | _BV(6);
+	DDRE = 0;
+
+	// Port F
+	// 0-1: Unused (floating)
+	// 4-7: Unused (floating)
+	PORTF = ~(_BV(2) | _BV(3));
+	DDRF = 0;
+
+	// External interrupts
+	EICRA = _BV(5); // Trigger INT2 on falling edge (datasheet p. 89)
+	EIMSK = _BV(2); // Enable INT2
 
 	TWI_init();
 	enableGlobalInterrupts();
@@ -59,13 +94,23 @@ void transmitLeds(led_buffer_t *buffer, u8 address) {
 		message.colors[index] = readLed(buffer, index);
 	}
 
-	TWI_transmit(address, (u8 *)&message, sizeof(message));
+	while (!TWI_transmit(address, (u8 *)&message, sizeof(message)));
+}
+
+void requestKeys() {
+	// TODO: perform request
+
+	shouldRequestKeys = false;
+	PORTB |= _BV(4);
 }
 
 void loop() {
 	nextLed(&leftLeds);
 	transmitLeds(&leftLeds, TWI_BASE_ADDRESS);
-	_delay_ms(100);
+	if (shouldRequestKeys) {
+		requestKeys();
+	}
+	_delay_ms(500);
 }
 
 int main() {
@@ -75,4 +120,9 @@ int main() {
 		loop();
 	}
 	__builtin_unreachable();
+}
+
+ISR(INT2_vect) {
+	shouldRequestKeys = true;
+	PORTB &= ~_BV(4);
 }

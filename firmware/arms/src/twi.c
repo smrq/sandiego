@@ -63,7 +63,6 @@ ISR(TWI_vect) {
 		case TW_SR_GCALL_DATA_ACK: // 0x90
 			switch (messageState) {
 				case COMMAND:
-					debug_count();
 					switch (TWDR) {
 						case TWI_CMD_SET_LEDS:
 							messageSize = 0;
@@ -72,6 +71,7 @@ ISR(TWI_vect) {
 							break;
 
 						case TWI_CMD_GET_KEY_STATE:
+							debug_count();
 							messageState = GET_KEY_STATE;
 							break;
 
@@ -120,6 +120,9 @@ ISR(TWI_vect) {
 					TWDR = keyscanner_getRowState(messageIndex++);
 					if (messageIndex == ROW_COUNT) {
 						messageState = IDLE;
+
+						// Clear callback interrupt on main processor
+						PORTB |= _BV(2);
 					}
 					TWI_listen(true);
 					break;

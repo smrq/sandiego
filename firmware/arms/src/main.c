@@ -14,20 +14,20 @@ local void setup() {
 	// 0-3: Rows 4-7 (if used: output, normally high; if unused: floating)
 	PORTA = 0xF;
 	DDRA =
-		(ROW_COUNT >= 5 ? _BV(0) : 0) |
-		(ROW_COUNT >= 6 ? _BV(1) : 0) |
-		(ROW_COUNT >= 7 ? _BV(2) : 0) |
-		(ROW_COUNT >= 8 ? _BV(3) : 0);
+		(ROW_COUNT > 4 ? _BV(0) : 0) |
+		(ROW_COUNT > 5 ? _BV(1) : 0) |
+		(ROW_COUNT > 6 ? _BV(2) : 0) |
+		(ROW_COUNT > 7 ? _BV(3) : 0);
 
 	// Port B
 	// 0-1: TWI address jumpers (either floating or low)
-	// 2:   SS (unused, floating)
+	// 2:   SS (callback interrupt: output, normally high)
 	// 3:   MOSI (output)
 	// 4:   MISO (floating -- connected only when programming with ISP)
 	// 5:   SCK (output)
 	// 6-7: Debug LEDs (output)
 	PORTB = _BV(0) | _BV(1) | _BV(2) | _BV(4);
-	DDRB = _BV(3) | _BV(5) | _BV(6) | _BV(7);
+	DDRB = _BV(2) | _BV(3) | _BV(5) | _BV(6) | _BV(7);
 
 	// Port C
 	// 0-3: Rows 0-3 (if used: output, normally high; if unused: floating)
@@ -37,10 +37,10 @@ local void setup() {
 	// 7:   Debug LED (output)
 	PORTC = _BV(0) | _BV(1) | _BV(2) | _BV(3);
 	DDRC =
-		(ROW_COUNT >= 1 ? _BV(0) : 0) |
-		(ROW_COUNT >= 2 ? _BV(1) : 0) |
-		(ROW_COUNT >= 3 ? _BV(2) : 0) |
-		(ROW_COUNT >= 4 ? _BV(3) : 0) |
+		(ROW_COUNT > 0 ? _BV(0) : 0) |
+		(ROW_COUNT > 1 ? _BV(1) : 0) |
+		(ROW_COUNT > 2 ? _BV(2) : 0) |
+		(ROW_COUNT > 3 ? _BV(3) : 0) |
 		_BV(7);
 
 	// Port D

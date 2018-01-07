@@ -71,7 +71,8 @@ void keyscanner_scan() {
 
 		u8 updatedKeys = keyscanner_debounce(&rowState[row], ~PIND);
 		if (__builtin_expect(updatedKeys, 0)) {
-			// TODO: Do something!
+			// Trigger callback interrupt on main processor
+			PORTB &= ~_BV(2);
 		}
 
 		switch (row) {
