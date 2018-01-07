@@ -5,7 +5,6 @@
 typedef struct {
 	u8 front[ROW_COUNT];
 	u8 back[ROW_COUNT];
-	bool flipped;
 } key_buffer_t;
 
 extern key_buffer_t leftKeys;

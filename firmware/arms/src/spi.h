@@ -17,3 +17,6 @@
 */
 #define SPCR_CLOCK_SETTINGS ((0 << SPR0) | (0 << SPR1))
 #define SPSR_CLOCK_SETTINGS (1 << SPI2X)
+
+void SPI_init();
+void SPI_transmit();

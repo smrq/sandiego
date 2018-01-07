@@ -16,10 +16,8 @@
 #define u32 uint32_t
 
 #define TWI_BASE_ADDRESS 0x58
-#define TWI_CMD_SET_LED 0x10
-#define TWI_CMD_SET_ALL_LEDS 0x20
-#define TWI_CMD_SET_LEDS 0x30
-#define TWI_CMD_GET_KEY_STATE 0x40
+#define TWI_CMD_SET_LEDS 0x10
+#define TWI_CMD_GET_KEY_STATE 0x20
 
 #define LED_COUNT 10
 

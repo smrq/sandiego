@@ -2,9 +2,11 @@
 #include <avr/interrupt.h>
 #include <util/twi.h>
 #include "defs.h"
-#include "led.h"
-#include "scan.h"
+#include "leds.h"
+#include "keyscanner.h"
+#include "spi.h"
 #include "twi.h"
+#include "debug.h"
 
 local u8 messageBuffer[TWI_BUFFER_SIZE] = { 0 };
 local u8 messageSize = 0;
@@ -12,8 +14,6 @@ local u8 messageIndex = 0;
 local enum MessageState {
 	IDLE,
 	COMMAND,
-	SET_LED,
-	SET_ALL_LEDS,
 	SET_LEDS,
 	GET_KEY_STATE
 } messageState = IDLE;
@@ -63,17 +63,8 @@ ISR(TWI_vect) {
 		case TW_SR_GCALL_DATA_ACK: // 0x90
 			switch (messageState) {
 				case COMMAND:
+					debug_count();
 					switch (TWDR) {
-						case TWI_CMD_SET_LED:
-							messageSize = 0;
-							messageState = SET_LED;
-							break;
-
-						case TWI_CMD_SET_ALL_LEDS:
-							messageSize = 0;
-							messageState = SET_ALL_LEDS;
-							break;
-
 						case TWI_CMD_SET_LEDS:
 							messageSize = 0;
 							messageIndex = 0;
@@ -91,38 +82,15 @@ ISR(TWI_vect) {
 					TWI_listen(true);
 					break;
 
-				case SET_LED:
-					messageBuffer[messageSize++] = TWDR;
-					if (messageSize == 5) {
-						u8 index = messageBuffer[0];
-						u32 color = *(u32 *)(messageBuffer + 1);
-						setLed(index, color);
-						transmitLeds();
-						messageState = IDLE;
-					}
-					TWI_listen(true);
-					break;
-
-				case SET_ALL_LEDS:
-					messageBuffer[messageSize++] = TWDR;
-					if (messageSize == 4) {
-						u32 color = *(u32 *)(messageBuffer);
-						setAllLeds(color);
-						transmitLeds();
-						messageState = IDLE;
-					}
-					TWI_listen(true);
-					break;
-
 				case SET_LEDS:
 					messageBuffer[messageSize++] = TWDR;
 					if (messageSize == 4) {
 						u32 color = *(u32 *)(messageBuffer);
-						setLed(messageIndex++, color);
+						led_setColor(messageIndex++, color);
 						messageSize = 0;
 
 						if (messageIndex == LED_COUNT) {
-							transmitLeds();
+							SPI_transmit();
 							messageState = IDLE;
 						}
 					}
@@ -149,7 +117,7 @@ ISR(TWI_vect) {
 		case TW_ST_DATA_ACK: // 0xB8
 			switch (messageState) {
 				case GET_KEY_STATE: {
-					TWDR = getRowState(messageIndex++);
+					TWDR = keyscanner_getRowState(messageIndex++);
 					if (messageIndex == ROW_COUNT) {
 						messageState = IDLE;
 					}
