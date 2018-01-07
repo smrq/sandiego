@@ -17,7 +17,7 @@ OPTFLAGS=-O2 -flto
 ARCHFLAGS=-mmcu=$(MCU) -DF_CPU=$(CPU)
 
 COMPILE=$(CC) $(DEPFLAGS) $(CFLAGS) $(OPTFLAGS) $(ARCHFLAGS) -c
-COMPILEASM=$(CC) $(DEPFLAGS) $(CFLAGS) $(ARCHFLAGS) -S
+COMPILEASM=$(CC) $(DEPFLAGS) $(CFLAGS) $(ARCHFLAGS) -S -fverbose-asm
 POSTCOMPILE=@mv -f $(DEPDIR)/$*.temp-d $(DEPDIR)/$*.d && touch $@
 LINK=$(CC) $(OPTFLAGS) $(ARCHFLAGS)
 
@@ -49,7 +49,12 @@ $(BINDIR)/%.hex: $(BINDIR)/%.elf
 	avr-objcopy -j .text -j .data -O ihex $< $@
 	avr-size --format=avr --mcu=$(MCU) $<
 
+$(BINDIR)/%.objdump: $(BINDIR)/%.elf
+	avr-objdump -D -S -s $< > $@
+
 include $(wildcard $(patsubst %,$(DEPDIR)/%.d,$(basename $(SOURCES))))
+
+dump: $(BINDIR)/$(TARGET).objdump
 
 flash: $(BINDIR)/$(TARGET).hex
 	avrdude -v -p $(MCU) -c arduino -P $(PORT) -U flash:w:$<
