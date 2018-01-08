@@ -1,18 +1,16 @@
 #include "defs.h"
+#include "debug.h"
 #include "leds.h"
+#include "keys.h"
 #include "twi.h"
-#include <util/delay.h>
-
-volatile bool shouldRequestKeys = false;
 
 void setup() {
 	// Port B
 	// 0:   SS (unused -- floating)
 	// 1-3: SCK, MOSI, MISO (floating -- connected only when programming with ISP)
-	// 4:   Debug LED (output)
-	// 5-7: Unused (floating)
-	PORTB = ~_BV(4); //0xFF;
-	DDRB = _BV(4);
+	// 4-7: Debug LED (output)
+	PORTB = _BV(0) | _BV(1) | _BV(2) | _BV(3) | _BV(4) | _BV(5) | _BV(6) | _BV(7);
+	DDRB = _BV(4) | _BV(5) | _BV(6) | _BV(7);
 
 	// Port C
 	// 6-7: Unused (floating)
@@ -22,8 +20,7 @@ void setup() {
 	// Port D
 	// 0:   SCL (ignored when TWEN bit in TWCR is set; external pull-up)
 	// 1:   SDA (ignored when TWEN bit in TWCR is set; external pull-up)
-	// 2:   INT2 (callback interrupt -- input, internal pullup)
-	// 3-6: Unused (floating)
+	// 2-6: Unused (floating)
 	PORTD = ~(_BV(0) | _BV(1));
 	DDRD = 0;
 
@@ -38,79 +35,51 @@ void setup() {
 	PORTF = ~(_BV(2) | _BV(3));
 	DDRF = 0;
 
-	// External interrupts
-	EICRA = _BV(5); // Trigger INT2 on falling edge (datasheet p. 89)
-	EIMSK = _BV(2); // Enable INT2
-
 	TWI_init();
 	enableGlobalInterrupts();
 }
 
-void nextLed(led_buffer_t *buffer) {
-	static u8 index = 0;
+void requestKeys(u8 address, key_buffer_t *buffer) {
+	while (!TWI_getKeyState(address, buffer));
+	while (TWI_busy()); // wait for transmission end synchronously
+	flipKeyBuffer(buffer);
+}
 
-	if (index < 1) {
-		writeAllLeds(buffer, 0x1000000);
-	}
-	else if (index < 11) {
-		writeLed(buffer, index - 1, 0x1FF0000);
-	}
-	else if (index < 21) {
-		writeLed(buffer, index - 11, 0x100FF00);
-	}
-	else if (index < 31) {
-		writeLed(buffer, index - 21, 0x10000FF);
-	}
-	else {
-		if (index % 2) {
-			u32 colors[LED_COUNT] = {
-				0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000,
-				0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF
-			};
-			writeLedPattern(buffer, colors);
-		} else {
-			u32 colors[LED_COUNT] = {
-				0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF,
-				0x1FF0000, 0x100FFFF, 0x1FF0000, 0x100FFFF, 0x1FF0000
-			};
-			writeLedPattern(buffer, colors);
+void updateLeds(led_buffer_t *leds, key_buffer_t *keys) {
+	for (u8 col = 0; col < COL_COUNT; ++col) {
+		u32 color = 0x1000000;
+		if (keys->front[0] & _BV(col)) {
+			color |= 0xFF0000;
 		}
+		if (keys->front[1] & _BV(col)) {
+			color |= 0x00FF00;
+		}
+		if (keys->front[2] & _BV(col)) {
+			color |= 0x0000FF;
+		}
+		if (keys->front[3] & _BV(col)) {
+			color |= 0xFFFF00;
+		}
+		if (keys->front[4] & _BV(col)) {
+			color |= 0xFF00FF;
+		}
+		writeLed(leds, col, color);
 	}
-
-	index = (index + 1) % 48;
 }
 
-void transmitLeds(led_buffer_t *buffer, u8 address) {
+void transmitLeds(u8 address, led_buffer_t *buffer) {
 	flipLedBuffer(buffer);
-
-	struct PACKED {
-		u8 command;
-		u32 colors[LED_COUNT];
-	} message = {
-		.command = TWI_CMD_SET_LEDS
-	};
-
-	for (u8 index = 0; index < LED_COUNT; ++index) {
-		message.colors[index] = readLed(buffer, index);
-	}
-
-	while (!TWI_transmit(address, (u8 *)&message, sizeof(message)));
-}
-
-void requestKeys() {
-	// TODO: perform request
-
-	shouldRequestKeys = false;
-	PORTB |= _BV(4);
+	while (!TWI_setLeds(address, buffer));
 }
 
 void loop() {
-	nextLed(&leftLeds);
-	transmitLeds(&leftLeds, TWI_BASE_ADDRESS);
-	if (shouldRequestKeys) {
-		requestKeys();
-	}
-	_delay_ms(500);
+	requestKeys(TWI_BASE_ADDRESS, &leftKeys);
+	requestKeys(TWI_BASE_ADDRESS | 1, &rightKeys);
+
+	updateLeds(&leftLeds, &leftKeys);
+
+	transmitLeds(TWI_BASE_ADDRESS, &leftLeds);
+	transmitLeds(TWI_BASE_ADDRESS | 1, &rightLeds);
 }
 
 int main() {
@@ -119,10 +88,6 @@ int main() {
 	while(1) {
 		loop();
 	}
-	__builtin_unreachable();
-}
 
-ISR(INT2_vect) {
-	shouldRequestKeys = true;
-	PORTB &= ~_BV(4);
+	__builtin_unreachable();
 }

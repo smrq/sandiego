@@ -1,4 +1,5 @@
 #include "defs.h"
+#include "debug.h"
 #include "keys.h"
 
 key_buffer_t leftKeys = { 0 };

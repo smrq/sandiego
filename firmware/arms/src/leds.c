@@ -1,5 +1,5 @@
-#include <avr/pgmspace.h>
 #include "defs.h"
+#include "debug.h"
 #include "leds.h"
 
 u32 ledBuffer[LED_COUNT] = {

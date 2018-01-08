@@ -1,6 +1,11 @@
 #pragma once
 
+#include <avr/cpufunc.h>
 #include <avr/interrupt.h>
+#include <avr/io.h>
+#include <avr/pgmspace.h>
+#include <util/delay.h>
+#include <util/twi.h>
 #include <stdint.h>
 #include <stdbool.h>
 

@@ -1,4 +1,5 @@
 #include "defs.h"
+#include "debug.h"
 #include "leds.h"
 #include "spi.h"
 

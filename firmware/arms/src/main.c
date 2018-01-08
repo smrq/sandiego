@@ -1,4 +1,5 @@
 #include "defs.h"
+#include "debug.h"
 #include "keyscanner.h"
 #include "spi.h"
 #include "twi.h"
@@ -26,7 +27,7 @@ local void setup() {
 	// 4:   MISO (floating -- connected only when programming with ISP)
 	// 5:   SCK (output)
 	// 6-7: Debug LEDs (output)
-	PORTB = _BV(0) | _BV(1) | _BV(2) | _BV(4);
+	PORTB = _BV(0) | _BV(1) | _BV(2) | _BV(4) | _BV(6) | _BV(7);
 	DDRB = _BV(2) | _BV(3) | _BV(5) | _BV(6) | _BV(7);
 
 	// Port C
@@ -35,7 +36,7 @@ local void setup() {
 	// 5:   SCL (ignored when TWEN bit in TWCR is set; external pull-up)
 	// 6:   RESET (ignored when RSTDISBL fuse is set; external pull-up)
 	// 7:   Debug LED (output)
-	PORTC = _BV(0) | _BV(1) | _BV(2) | _BV(3);
+	PORTC = _BV(0) | _BV(1) | _BV(2) | _BV(3) | _BV(7);
 	DDRC =
 		(ROW_COUNT > 0 ? _BV(0) : 0) |
 		(ROW_COUNT > 1 ? _BV(1) : 0) |

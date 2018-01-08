@@ -1,10 +1,10 @@
-#include <avr/cpufunc.h>
 #include "defs.h"
+#include "debug.h"
 #include "keyscanner.h"
 
 local keyscanner_rowstate_t rowState[ROW_COUNT] = { 0 };
 
-local u8 keyscanner_debounce(keyscanner_rowstate_t *row, u8 pressed) {
+local void keyscanner_debounce(keyscanner_rowstate_t *row, u8 pressed) {
 	/*
 		Two-bit counter
 
@@ -25,8 +25,6 @@ local u8 keyscanner_debounce(keyscanner_rowstate_t *row, u8 pressed) {
 	row->counterHigh = delta & (row->counterHigh ^ row->counterLow);
 	row->counterLow = delta & ~(row->counterLow);
 	row->current ^= counterOverflow;
-
-	return counterOverflow;
 }
 
 void keyscanner_scan() {
@@ -69,11 +67,7 @@ void keyscanner_scan() {
 		*/
 		_NOP();
 
-		u8 updatedKeys = keyscanner_debounce(&rowState[row], ~PIND);
-		if (__builtin_expect(updatedKeys, 0)) {
-			// Trigger callback interrupt on main processor
-			PORTB &= ~_BV(2);
-		}
+		keyscanner_debounce(&rowState[row], ~PIND);
 
 		switch (row) {
 #if ROW_COUNT > 0
