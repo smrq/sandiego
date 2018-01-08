@@ -5,6 +5,9 @@ DEPDIR=dep
 OBJDIR=obj
 BINDIR=bin
 
+SHAREDDIR=$(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+VENDORDIR=$(abspath $(SHAREDDIR)/../vendor)
+
 # NOTE: For whatever reason, the Teensy ArduinoISP seems to change tty every
 # time it's plugged in.  On my system, it seems to always be the second
 # tty.usbmodem* entry, so I just figure out what that is dynamically.
@@ -12,14 +15,16 @@ BINDIR=bin
 PORT:=$(shell ls /dev/tty.usbmodem* | sed -n '2 p')
 
 DEPFLAGS=-MT $@ -MMD -MP -MF $(DEPDIR)/$*.temp-d
-CFLAGS=-Wall -Wextra -Werror=implicit-function-declaration -std=gnu11 -I$(abspath ../shared)
+CFLAGS=-Wall -Wextra -Werror=implicit-function-declaration -std=gnu11 -I$(VENDORDIR) -I$(SHAREDDIR)
 OPTFLAGS=-O2 -flto
-ARCHFLAGS=-mmcu=$(MCU) -DF_CPU=$(CPU)
+ARCHFLAGS=-mmcu=$(MCU) -DF_CPU=$(CPU) -DF_USB=$(CPU)
+AVRDUDEFLAGS=-C $(SHAREDDIR)/avrdude.conf -p $(MCU) -c arduino -P $(PORT) -v
 
 COMPILE=$(CC) $(DEPFLAGS) $(CFLAGS) $(OPTFLAGS) $(ARCHFLAGS) -c
 COMPILEASM=$(CC) $(DEPFLAGS) $(CFLAGS) $(ARCHFLAGS) -S -fverbose-asm
 POSTCOMPILE=@mv -f $(DEPDIR)/$*.temp-d $(DEPDIR)/$*.d && touch $@
 LINK=$(CC) $(OPTFLAGS) $(ARCHFLAGS)
+AVRDUDE=avrdude $(AVRDUDEFLAGS)
 
 $(shell mkdir -p $(DEPDIR) >/dev/null)
 $(shell mkdir -p $(OBJDIR) >/dev/null)
@@ -57,10 +62,13 @@ include $(wildcard $(patsubst %,$(DEPDIR)/%.d,$(basename $(SOURCES))))
 dump: $(BINDIR)/$(TARGET).objdump
 
 flash: $(BINDIR)/$(TARGET).hex
-	avrdude -v -p $(MCU) -c arduino -P $(PORT) -U flash:w:$<
+	$(AVRDUDE) -U flash:w:$<
+
+read-fuse:
+	$(AVRDUDE) -U lfuse:r:-:h -U hfuse:r:-:h -U efuse:r:-:h
 
 clean:
 	rm -rf $(OBJDIR) $(BINDIR) $(DEPDIR)
 
-.PHONY: clean flash
+.PHONY: dump flash read-fuse clean
 .PRECIOUS: $(DEPDIR)/%.d
