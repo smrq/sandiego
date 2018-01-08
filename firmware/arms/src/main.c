@@ -5,6 +5,10 @@
 #include "twi.h"
 
 local void setup() {
+	// Set clock prescaler to 1 regardless of fuse bits
+	CLKPR = _BV(CLKPCE);
+	CLKPR = 0;
+
 	// Row pins are configured as outputs that are normally high.
 	// Column pins are configured as inputs with the pull-up resistor enabled.
 	// When doing a key scan, a single row is set to low.

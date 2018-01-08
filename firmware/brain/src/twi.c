@@ -17,6 +17,15 @@ local volatile enum MessageState {
 } messageState = IDLE;
 
 void TWI_init() {
+	/*
+		TWBR should be 10 or higher if the TWI operates in Master mode. If TWBR is lower than 10,
+		the Master may produce an incorrect output on SDA and SCL for the reminder of the byte.
+		The problem occurs when operating the TWI in Master mode, sending Start + SLA + R/W to a
+		Slave (a Slave does not need to be connected to the bus for the condition to happen).
+			- ATmega32U4 datasheet, p. 231
+	*/
+	TWBR = 10;
+
 	// Set bit rate prescaler to 1
 	TWSR &= ~(_BV(TWPS0) | _BV(TWPS1));
 }

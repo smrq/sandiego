@@ -5,6 +5,10 @@
 #include "twi.h"
 
 void setup() {
+	// Set clock prescaler to 1 regardless of fuse bits
+	CLKPR = _BV(CLKPCE);
+	CLKPR = 0;
+
 	// Port B
 	// 0:   SS (unused -- floating)
 	// 1-3: SCK, MOSI, MISO (floating -- connected only when programming with ISP)
@@ -36,6 +40,7 @@ void setup() {
 	DDRF = 0;
 
 	TWI_init();
+
 	enableGlobalInterrupts();
 }
 
