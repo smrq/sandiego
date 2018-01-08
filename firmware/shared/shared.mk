@@ -14,15 +14,14 @@ VENDORDIR=$(abspath $(SHAREDDIR)/../vendor)
 # If there's a way of determining this more robustly, that would be great.
 PORT:=$(shell ls /dev/tty.usbmodem* | sed -n '2 p')
 
-DEPFLAGS=-MT $@ -MMD -MP -MF $(DEPDIR)/$*.temp-d
-CFLAGS=-Wall -Wextra -Werror=implicit-function-declaration -std=gnu11 -I$(VENDORDIR) -I$(SHAREDDIR)
-OPTFLAGS=-O2 -flto
-ARCHFLAGS=-mmcu=$(MCU) -DF_CPU=$(CPU) -DF_USB=$(CPU)
-AVRDUDEFLAGS=-C $(SHAREDDIR)/avrdude.conf -p $(MCU) -c arduino -P $(PORT) -v
+DEPFLAGS+=-MT $@ -MMD -MP -MF $(DEPDIR)/$*.temp-d
+CFLAGS+=-Wall -Wextra -Werror=implicit-function-declaration -std=gnu11 -I$(VENDORDIR) -I$(SHAREDDIR)
+OPTFLAGS+=-O2 -flto
+ARCHFLAGS+=-mmcu=$(MCU) -DF_CPU=$(CPU)
+AVRDUDEFLAGS+=-C $(SHAREDDIR)/avrdude.conf -p $(MCU) -c arduino -P $(PORT) -v
 
 COMPILE=$(CC) $(DEPFLAGS) $(CFLAGS) $(OPTFLAGS) $(ARCHFLAGS) -c
-COMPILEASM=$(CC) $(DEPFLAGS) $(CFLAGS) $(ARCHFLAGS) -S -fverbose-asm
-POSTCOMPILE=@mv -f $(DEPDIR)/$*.temp-d $(DEPDIR)/$*.d && touch $@
+COMPILEVENDOR=$(CC) $(CFLAGS) $(OPTFLAGS) $(ARCHFLAGS) -c
 LINK=$(CC) $(OPTFLAGS) $(ARCHFLAGS)
 AVRDUDE=avrdude $(AVRDUDEFLAGS)
 
@@ -30,25 +29,25 @@ $(shell mkdir -p $(DEPDIR) >/dev/null)
 $(shell mkdir -p $(OBJDIR) >/dev/null)
 $(shell mkdir -p $(BINDIR) >/dev/null)
 
-SOURCES = $(wildcard $(SRCDIR)/*.c)
-OBJECTS = $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+SOURCES=$(wildcard $(SRCDIR)/*.c)
+OBJECTS+=$(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 all: $(BINDIR)/$(TARGET).hex
 
+$(OBJDIR)/vendor/%.o: $(VENDORDIR)/%.c
+	@mkdir -p $(@D)
+	$(COMPILEVENDOR) $< -o $@
+
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(DEPDIR)/%.d
+	@mkdir -p $(@D)
 	$(COMPILE) $< -o $@
-	$(POSTCOMPILE)
-
-$(OBJDIR)/%.S: $(SRCDIR)/%.c
-$(OBJDIR)/%.S: $(SRCDIR)/%.c $(DEPDIR)/%.d
-	$(COMPILEASM) $< -o $@
-	$(POSTCOMPILE)
+	@mv -f $(DEPDIR)/$*.temp-d $(DEPDIR)/$*.d && touch $@
 
 $(DEPDIR)/%.d: ;
 
 $(BINDIR)/$(TARGET).elf: $(OBJECTS)
-	$(LINK) $(OBJECTS) -o $@
+	$(LINK) $^ -o $@
 
 $(BINDIR)/%.hex: $(BINDIR)/%.elf
 	avr-objcopy -j .text -j .data -O ihex $< $@
