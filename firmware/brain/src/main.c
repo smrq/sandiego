@@ -3,15 +3,14 @@
 #include "leds.h"
 #include "keys.h"
 #include "twi.h"
-#include "usb-hid.h"
-#include <LUFA/Drivers/USB/USB.h>
+#include "usb.h"
 
 void setup() {
 	// Set clock prescaler to 1 regardless of fuse bits
 	CLKPR = _BV(CLKPCE);
 	CLKPR = 0;
 
-	// wdt_disable(); // This should be the default
+	wdt_disable(); // This should be the default
 
 	// Port B
 	// 0:   SS (unused -- floating)
@@ -44,16 +43,8 @@ void setup() {
 	DDRF = 0;
 
 	TWI_init();
-
-	USB_Init();
-
+	USB_init();
 	enableGlobalInterrupts();
-}
-
-void requestKeys(u8 address, key_buffer_t *buffer) {
-	while (!TWI_getKeyState(address, buffer));
-	while (TWI_busy()); // wait for transmission end synchronously
-	flipKeyBuffer(buffer);
 }
 
 void updateLeds(led_buffer_t *leds, key_buffer_t *keys) {
@@ -78,16 +69,11 @@ void updateLeds(led_buffer_t *leds, key_buffer_t *keys) {
 	}
 }
 
-void transmitLeds(u8 address, led_buffer_t *buffer) {
-	flipLedBuffer(buffer);
-	while (!TWI_setLeds(address, buffer));
-}
-
 void loop() {
 	requestKeys(TWI_BASE_ADDRESS, &leftKeys);
 	requestKeys(TWI_BASE_ADDRESS | 1, &rightKeys);
 
-	HID_update();
+	USB_update();
 
 	updateLeds(&leftLeds, &leftKeys);
 

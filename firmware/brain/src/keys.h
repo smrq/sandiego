@@ -13,3 +13,4 @@ extern key_buffer_t rightKeys;
 void writeKeyRow(key_buffer_t *buffer, u8 row, u8 keys);
 u8 readKeyRow(key_buffer_t *buffer, u8 row);
 void flipKeyBuffer(key_buffer_t *buffer);
+void requestKeys(u8 address, key_buffer_t *buffer);

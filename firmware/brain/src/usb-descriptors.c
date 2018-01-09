@@ -1,16 +1,31 @@
 #include "defs.h"
 #include "usb-descriptors.h"
 
-/** HID class report descriptor. This is a special descriptor constructed with values from the
- *  USBIF HID class specification to describe the reports and capabilities of the HID device. This
- *  descriptor is parsed by the host and its contents used to determine what data (and in what encoding)
- *  the device will send, and what it may be sent back from the host. Refer to the HID specification for
- *  more details on HID report descriptors.
- */
-const USB_Descriptor_HIDReport_Datatype_t PROGMEM KeyboardReport[] = {
+typedef struct {
+	USB_Descriptor_Configuration_Header_t Config;
+
+	// Keyboard HID Interface
+	USB_Descriptor_Interface_t HID_Interface;
+	USB_HID_Descriptor_HID_t   HID_KeyboardHID;
+	USB_Descriptor_Endpoint_t  HID_ReportINEndpoint;
+	USB_Descriptor_Endpoint_t  HID_ReportOUTEndpoint;
+} USB_Descriptor_Configuration_t;
+
+enum InterfaceDescriptors_t {
+	INTERFACE_ID_Keyboard = 0
+};
+
+enum StringDescriptors_t {
+	STRING_ID_Language     = 0,
+	STRING_ID_Manufacturer = 1,
+	STRING_ID_Product      = 2
+};
+
+const USB_Descriptor_HIDReport_Datatype_t PROGMEM BootKeyboardReportDescriptor[] = {
 	HID_RI_USAGE_PAGE(8, 0x01), /* Generic Desktop */
 	HID_RI_USAGE(8, 0x06), /* Keyboard */
 	HID_RI_COLLECTION(8, 0x01), /* Application */
+
 		HID_RI_USAGE_PAGE(8, 0x07), /* Key Codes */
 		HID_RI_USAGE_MINIMUM(8, 0xE0), /* Keyboard Left Control */
 		HID_RI_USAGE_MAXIMUM(8, 0xE7), /* Keyboard Right GUI */
@@ -19,9 +34,66 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM KeyboardReport[] = {
 		HID_RI_REPORT_SIZE(8, 0x01),
 		HID_RI_REPORT_COUNT(8, 0x08),
 		HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
+
 		HID_RI_REPORT_COUNT(8, 0x01),
 		HID_RI_REPORT_SIZE(8, 0x08),
 		HID_RI_INPUT(8, HID_IOF_CONSTANT),
+
+		HID_RI_USAGE_PAGE(8, 0x08), /* LEDs */
+		HID_RI_USAGE_MINIMUM(8, 0x01), /* Num Lock */
+		HID_RI_USAGE_MAXIMUM(8, 0x05), /* Kana */
+		HID_RI_REPORT_COUNT(8, 0x05),
+		HID_RI_REPORT_SIZE(8, 0x01),
+		HID_RI_OUTPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE | HID_IOF_NON_VOLATILE),
+
+		HID_RI_REPORT_COUNT(8, 0x01),
+		HID_RI_REPORT_SIZE(8, 0x03),
+		HID_RI_OUTPUT(8, HID_IOF_CONSTANT),
+
+		HID_RI_LOGICAL_MINIMUM(8, 0x00),
+		HID_RI_LOGICAL_MAXIMUM(8, 0x65),
+		HID_RI_USAGE_PAGE(8, 0x07), /* Keyboard */
+		HID_RI_USAGE_MINIMUM(8, 0x00), /* Reserved (no event indicated) */
+		HID_RI_USAGE_MAXIMUM(8, 0x65), /* Keyboard Application */
+		HID_RI_REPORT_COUNT(8, 0x06),
+		HID_RI_REPORT_SIZE(8, 0x08),
+		HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_ARRAY | HID_IOF_ABSOLUTE),
+	HID_RI_END_COLLECTION(0)
+};
+
+const USB_Descriptor_HIDReport_Datatype_t PROGMEM NKROKeyboardReportDescriptor[] = {
+	HID_RI_USAGE_PAGE(8, 0x01), /* Generic Desktop */
+	HID_RI_USAGE(8, 0x06), /* Keyboard */
+	HID_RI_COLLECTION(8, 0x01), /* Application */
+		HID_RI_USAGE_PAGE(8, 0x07), /* Key Codes */
+		HID_RI_LOGICAL_MINIMUM(8, 0x00),
+		HID_RI_LOGICAL_MAXIMUM(8, 0x01),
+		HID_RI_REPORT_SIZE(8, 0x01),
+		HID_RI_REPORT_COUNT(8, 0x20),
+			HID_RI_USAGE_MINIMUM(8, 0x00),
+			HID_RI_USAGE_MAXIMUM(8, 0x1F),
+			HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
+			HID_RI_USAGE_MINIMUM(8, 0x20),
+			HID_RI_USAGE_MAXIMUM(8, 0x3F),
+			HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
+			HID_RI_USAGE_MINIMUM(8, 0x40),
+			HID_RI_USAGE_MAXIMUM(8, 0x5F),
+			HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
+			HID_RI_USAGE_MINIMUM(8, 0x60),
+			HID_RI_USAGE_MAXIMUM(8, 0x7F),
+			HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
+			HID_RI_USAGE_MINIMUM(8, 0x80),
+			HID_RI_USAGE_MAXIMUM(8, 0x9F),
+			HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
+			HID_RI_USAGE_MINIMUM(8, 0xA0),
+			HID_RI_USAGE_MAXIMUM(8, 0xBF),
+			HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
+			HID_RI_USAGE_MINIMUM(8, 0xC0),
+			HID_RI_USAGE_MAXIMUM(8, 0xDF),
+			HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
+			HID_RI_USAGE_MINIMUM(8, 0xE0),
+			HID_RI_USAGE_MAXIMUM(8, 0xFF),
+			HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
 		HID_RI_USAGE_PAGE(8, 0x08), /* LEDs */
 		HID_RI_USAGE_MINIMUM(8, 0x01), /* Num Lock */
 		HID_RI_USAGE_MAXIMUM(8, 0x05), /* Kana */
@@ -31,22 +103,9 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM KeyboardReport[] = {
 		HID_RI_REPORT_COUNT(8, 0x01),
 		HID_RI_REPORT_SIZE(8, 0x03),
 		HID_RI_OUTPUT(8, HID_IOF_CONSTANT),
-		HID_RI_LOGICAL_MINIMUM(8, 0x00),
-		HID_RI_LOGICAL_MAXIMUM(8, 0x65),
-		HID_RI_USAGE_PAGE(8, 0x07), /* Keyboard */
-		HID_RI_USAGE_MINIMUM(8, 0x00), /* Reserved (no event indicated) */
-		HID_RI_USAGE_MAXIMUM(8, 0x65), /* Keyboard Application */
-		HID_RI_REPORT_COUNT(8, 0x06),
-		HID_RI_REPORT_SIZE(8, 0x08),
-		HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_ARRAY | HID_IOF_ABSOLUTE),
-	HID_RI_END_COLLECTION(0),
+	HID_RI_END_COLLECTION(0)
 };
 
-/** Device descriptor structure. This descriptor, located in FLASH memory, describes the overall
- *  device characteristics, including the supported USB version, control endpoint size and the
- *  number of device configurations. The descriptor is read out by the USB host when the enumeration
- *  process begins.
- */
 const USB_Descriptor_Device_t PROGMEM DeviceDescriptor = {
 	.Header = {
 		.Size = sizeof(USB_Descriptor_Device_t),
@@ -62,7 +121,7 @@ const USB_Descriptor_Device_t PROGMEM DeviceDescriptor = {
 
 	.VendorID               = 0xF055,
 	.ProductID              = 0x2042,
-	.ReleaseNumber          = VERSION_BCD(0,0,1),
+	.ReleaseNumber          = VERSION_BCD(2,0,0),
 
 	.ManufacturerStrIndex   = STRING_ID_Manufacturer,
 	.ProductStrIndex        = STRING_ID_Product,
@@ -71,11 +130,6 @@ const USB_Descriptor_Device_t PROGMEM DeviceDescriptor = {
 	.NumberOfConfigurations = FIXED_NUM_CONFIGURATIONS
 };
 
-/** Configuration descriptor structure. This descriptor, located in FLASH memory, describes the usage
- *  of the device in one of its supported configurations, including information about any device interfaces
- *  and endpoints. The descriptor is read out by the USB host during the enumeration process when selecting
- *  a configuration so that the host may correctly communicate with the USB device.
- */
 const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor = {
 	.Config = {
 		.Header = {
@@ -122,7 +176,7 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor = {
 		.CountryCode            = 0x00,
 		.TotalReportDescriptors = 1,
 		.HIDReportType          = HID_DTYPE_Report,
-		.HIDReportLength        = sizeof(KeyboardReport)
+		.HIDReportLength        = sizeof(NKROKeyboardReportDescriptor)
 	},
 
 	.HID_ReportINEndpoint = {
@@ -150,46 +204,26 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor = {
 	}
 };
 
-/** Language descriptor structure. This descriptor, located in FLASH memory, is returned when the host requests
- *  the string descriptor with index 0 (the first index). It is actually an array of 16-bit integers, which indicate
- *  via the language ID table available at USB.org what languages the device supports for its string descriptors.
- */
 const USB_Descriptor_String_t PROGMEM LanguageString = USB_STRING_DESCRIPTOR_ARRAY(LANGUAGE_ID_ENG);
-
-/** Manufacturer descriptor string. This is a Unicode string containing the manufacturer's details in human readable
- *  form, and is read out upon request by the host when the appropriate string ID is requested, listed in the Device
- *  Descriptor.
- */
 const USB_Descriptor_String_t PROGMEM ManufacturerString = USB_STRING_DESCRIPTOR(L"smrq");
-
-/** Product descriptor string. This is a Unicode string containing the product's details in human readable form,
- *  and is read out upon request by the host when the appropriate string ID is requested, listed in the Device
- *  Descriptor.
- */
 const USB_Descriptor_String_t PROGMEM ProductString = USB_STRING_DESCRIPTOR(L"Sandiego Keyboard");
 
-/** This function is called by the library when in device mode, and must be overridden (see library "USB Descriptors"
- *  documentation) by the application code so that the address and size of a requested descriptor can be given
- *  to the USB library. When the device receives a Get Descriptor request on the control endpoint, this function
- *  is called so that the descriptor details can be passed back and the appropriate descriptor sent back to the
- *  USB host.
- */
 u16 CALLBACK_USB_GetDescriptor(const u16 wValue, UNUSED const u16 wIndex, const void** const descriptorAddress) {
-	const u8 descriptorType = (wValue >> 8);
-	const u8 descriptorNumber = (wValue & 0xFF);
+	const u8 descriptorType = (wValue >> 8) & 0xFF;
+	const u8 descriptorNumber = (wValue >> 0) & 0xFF;
 
-	const void* address = NULL;
-	uint16_t size = NO_DESCRIPTOR;
+	const void *address = NULL;
+	u16 size = NO_DESCRIPTOR;
 
 	switch (descriptorType) {
 		case DTYPE_Device:
 			address = &DeviceDescriptor;
-			size    = sizeof(USB_Descriptor_Device_t);
+			size = sizeof(USB_Descriptor_Device_t);
 			break;
 
 		case DTYPE_Configuration:
 			address = &ConfigurationDescriptor;
-			size    = sizeof(USB_Descriptor_Configuration_t);
+			size = sizeof(USB_Descriptor_Configuration_t);
 			break;
 
 		case DTYPE_String:
@@ -216,8 +250,8 @@ u16 CALLBACK_USB_GetDescriptor(const u16 wValue, UNUSED const u16 wIndex, const 
 			break;
 
 		case HID_DTYPE_Report:
-			address = &KeyboardReport;
-			size = sizeof(KeyboardReport);
+			address = &NKROKeyboardReportDescriptor;
+			size = sizeof(NKROKeyboardReportDescriptor);
 			break;
 	}
 

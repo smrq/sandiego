@@ -1,6 +1,7 @@
 #include "defs.h"
 #include "debug.h"
 #include "leds.h"
+#include "twi.h"
 
 led_buffer_t leftLeds = { 0 };
 led_buffer_t rightLeds = { 0 };
@@ -29,4 +30,9 @@ void flipLedBuffer(led_buffer_t *buffer) {
 	for (u8 index = 0; index < LED_COUNT; ++index) {
 		buffer->front[index] = buffer->back[index];
 	}
+}
+
+void transmitLeds(u8 address, led_buffer_t *buffer) {
+	flipLedBuffer(buffer);
+	while (!TWI_setLeds(address, buffer));
 }
