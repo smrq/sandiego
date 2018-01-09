@@ -3,11 +3,10 @@
 #include <LUFA/Drivers/USB/USB.h>
 #include "defs.h"
 
-#define KEYBOARD_IN_EPADDR (ENDPOINT_DIR_IN  | 1)
+#define KEYBOARD_IN_EPADDR (ENDPOINT_DIR_IN | 1)
 #define KEYBOARD_OUT_EPADDR (ENDPOINT_DIR_OUT | 2)
 #define KEYBOARD_EPSIZE 32
 
-uint16_t CALLBACK_USB_GetDescriptor(
-	const u16 wValue,
-    const u16 wIndex,
-    const void** const DescriptorAddress);
+#define VENDOR_ID      0xF055
+#define PRODUCT_ID     0x2042
+#define RELEASE_NUMBER VERSION_BCD(2,0,0)

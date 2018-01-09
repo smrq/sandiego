@@ -4,17 +4,19 @@
 #include "keys.h"
 #include "twi.h"
 
-local u8 messageRecipient = 0;
-local void *messageBuffer;
-local volatile u16 messageIndex = 0;
-local volatile enum MessageState {
+enum MessageState_t {
 	IDLE,
 	SET_LEDS_COMMAND,
 	SET_LEDS_COLOR,
 	GET_KEY_STATE_COMMAND,
 	GET_KEY_STATE_DATA,
 	FINISHED
-} messageState = IDLE;
+};
+
+local u8 messageRecipient = 0;
+local void *messageBuffer;
+local volatile u16 messageIndex = 0;
+local volatile enum MessageState_t messageState = IDLE;
 
 void TWI_init() {
 	/*

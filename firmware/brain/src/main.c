@@ -65,20 +65,20 @@ void updateLeds(led_buffer_t *leds, key_buffer_t *keys) {
 		if (keys->front[4] & _BV(col)) {
 			color |= 0xFF00FF;
 		}
-		writeLed(leds, col, color);
+		leds->back[col] = color;
 	}
 }
 
 void loop() {
-	requestKeys(TWI_BASE_ADDRESS, &leftKeys);
-	requestKeys(TWI_BASE_ADDRESS | 1, &rightKeys);
+	requestKeys(TWI_ADDRESS_LEFT, &leftKeys);
+	requestKeys(TWI_ADDRESS_RIGHT, &rightKeys);
 
 	USB_update();
 
 	updateLeds(&leftLeds, &leftKeys);
 
-	transmitLeds(TWI_BASE_ADDRESS, &leftLeds);
-	transmitLeds(TWI_BASE_ADDRESS | 1, &rightLeds);
+	transmitLeds(TWI_ADDRESS_LEFT, &leftLeds);
+	transmitLeds(TWI_ADDRESS_RIGHT, &rightLeds);
 }
 
 int main() {

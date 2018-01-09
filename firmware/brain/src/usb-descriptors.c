@@ -1,3 +1,4 @@
+#include <LUFA/Drivers/USB/USB.h>
 #include "defs.h"
 #include "usb-descriptors.h"
 
@@ -119,9 +120,9 @@ const USB_Descriptor_Device_t PROGMEM DeviceDescriptor = {
 
 	.Endpoint0Size          = FIXED_CONTROL_ENDPOINT_SIZE,
 
-	.VendorID               = 0xF055,
-	.ProductID              = 0x2042,
-	.ReleaseNumber          = VERSION_BCD(2,0,0),
+	.VendorID               = VENDOR_ID,
+	.ProductID              = PRODUCT_ID,
+	.ReleaseNumber          = RELEASE_NUMBER,
 
 	.ManufacturerStrIndex   = STRING_ID_Manufacturer,
 	.ProductStrIndex        = STRING_ID_Product,
@@ -145,6 +146,8 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor = {
 
 		.ConfigAttributes       = (USB_CONFIG_ATTR_RESERVED | USB_CONFIG_ATTR_SELFPOWERED),
 
+		// I *definitely* promise not to use more than 100mA... per LED^H^H^H^H^H^H^H
+		// I think this same lie is in every single USB-based Arduino project.
 		.MaxPowerConsumption    = USB_CONFIG_POWER_MA(100)
 	},
 

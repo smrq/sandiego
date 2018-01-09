@@ -9,6 +9,7 @@
 #include <util/twi.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define local static
 #define enableGlobalInterrupts sei
@@ -22,6 +23,9 @@
 #define u32 uint32_t
 
 #define TWI_BASE_ADDRESS 0x58
+#define TWI_ADDRESS_LEFT TWI_BASE_ADDRESS
+#define TWI_ADDRESS_RIGHT (TWI_BASE_ADDRESS | 0x01)
+
 #define TWI_CMD_SET_LEDS 0x10
 #define TWI_CMD_GET_KEY_STATE 0x20
 
