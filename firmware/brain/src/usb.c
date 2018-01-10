@@ -1,133 +1,20 @@
-#include <LUFA/Drivers/USB/USB.h>
 #include "defs.h"
 #include "debug.h"
 #include "keys.h"
-#include "usb-descriptors.h"
 #include "usb.h"
-#include "usb-reports.h"
 
-local bool usingReportProtocol = true;
-local u16 idleTimeoutDuration = 500;
-local u16 idleTimeoutRemaining = 0;
+u8 USB_ConfigurationNumber = 0;
+bool USB_RemoteWakeupEnabled = false;
+bool USB_UsingReportProtocol = true;
 
-void EVENT_USB_Device_Connect() {
-	/*
-		When initialized, all devices default to report protocol.
-			- Device Class Definition for HID 1.11, section 7.2.6, p. 54
-	*/
-	usingReportProtocol = true;
-	debug_output(DEBUG_USB_ENUMERATING);
-}
-
-void EVENT_USB_Device_Disconnect() {
-	debug_output(DEBUG_USB_NOTREADY);
-}
-
-/** Event handler for the USB_ConfigurationChanged event. This is fired when the host sets the current configuration
- *  of the USB device after enumeration, and configures the keyboard device endpoints.
- */
-void EVENT_USB_Device_ConfigurationChanged(void)
-{
-	bool success = true;
-	success &= Endpoint_ConfigureEndpoint(KEYBOARD_IN_EPADDR, EP_TYPE_INTERRUPT, KEYBOARD_EPSIZE, 1);
-	success &= Endpoint_ConfigureEndpoint(KEYBOARD_OUT_EPADDR, EP_TYPE_INTERRUPT, KEYBOARD_EPSIZE, 1);
-
-	USB_Device_EnableSOFEvents();
-
-	debug_output(success ? DEBUG_USB_READY : DEBUG_USB_ERROR);
-}
-
-void EVENT_USB_Device_ControlRequest(void) {
-	switch (USB_ControlRequest.bRequest) {
-		/* See: Device Class Definition for HID 1.11, section 7.2.1, p. 51 */
-		case HID_REQ_GetReport:
-			if (USB_ControlRequest.bmRequestType == (REQDIR_DEVICETOHOST | REQTYPE_CLASS | REQREC_INTERFACE)) {
-				union {
-					USB_bootKeyboardReport_t boot;
-					USB_nkroKeyboardReport_t nkro;
-				} report = { 0 };
-
-				if (usingReportProtocol) {
-					populateNkroKeyboardReport(&report.nkro);
-				} else {
-					populateBootKeyboardReport(&report.boot);
-				}
-
-				Endpoint_ClearSETUP();
-				Endpoint_Write_Control_Stream_LE(&report, usingReportProtocol ? sizeof(report.nkro) : sizeof(report.boot));
-				Endpoint_ClearOUT();
-			}
-			break;
-
-		/* See: Device Class Definition for HID 1.11, section 7.2.2, p. 52 */
-		case HID_REQ_SetReport:
-			if (USB_ControlRequest.bmRequestType == (REQDIR_HOSTTODEVICE | REQTYPE_CLASS | REQREC_INTERFACE)) {
-				Endpoint_ClearSETUP();
-				while (!Endpoint_IsOUTReceived()) {
-					if (USB_DeviceState == DEVICE_STATE_Unattached) {
-						return;
-					}
-				}
-				USB_ledReport_t report = Endpoint_Read_8();
-				Endpoint_ClearOUT();
-				Endpoint_ClearStatusStage();
-
-				processLEDReport(report);
-			}
-
-			break;
-
-		/* See: Device Class Definition for HID 1.11, section 7.2.5, p. 54 */
-		case HID_REQ_GetProtocol:
-			if (USB_ControlRequest.bmRequestType == (REQDIR_DEVICETOHOST | REQTYPE_CLASS | REQREC_INTERFACE)) {
-				Endpoint_ClearSETUP();
-				Endpoint_Write_8(usingReportProtocol);
-				Endpoint_ClearIN();
-				Endpoint_ClearStatusStage();
-			}
-
-			break;
-
-		/* See: Device Class Definition for HID 1.11, section 7.2.6, p. 54 */
-		case HID_REQ_SetProtocol:
-			if (USB_ControlRequest.bmRequestType == (REQDIR_HOSTTODEVICE | REQTYPE_CLASS | REQREC_INTERFACE)) {
-				Endpoint_ClearSETUP();
-				Endpoint_ClearStatusStage();
-
-				/* Set or clear the flag depending on what the host indicates that the current Protocol should be */
-				usingReportProtocol = (USB_ControlRequest.wValue != 0);
-			}
-
-			break;
-
-		/* See: Device Class Definition for HID 1.11, section 7.2.4, p. 52-53 */
-		case HID_REQ_SetIdle:
-			if (USB_ControlRequest.bmRequestType == (REQDIR_HOSTTODEVICE | REQTYPE_CLASS | REQREC_INTERFACE)) {
-				Endpoint_ClearSETUP();
-				Endpoint_ClearStatusStage();
-				idleTimeoutDuration = ((USB_ControlRequest.wValue & 0xFF00) >> 6);
-			}
-
-			break;
-
-		/* See: Device Class Definition for HID 1.11, section 7.2.3, p. 52 */
-		case HID_REQ_GetIdle:
-			if (USB_ControlRequest.bmRequestType == (REQDIR_DEVICETOHOST | REQTYPE_CLASS | REQREC_INTERFACE)) {
-				Endpoint_ClearSETUP();
-				Endpoint_Write_8(idleTimeoutDuration >> 2);
-				Endpoint_ClearIN();
-				Endpoint_ClearStatusStage();
-			}
-			break;
-	}
-}
-
-void EVENT_USB_Device_StartOfFrame()
-{
-	if (idleTimeoutRemaining) {
-		idleTimeoutRemaining--;
-	}
-}
+/*
+	The recommended default idle rate (rate when the device is initialized) is 500
+	milliseconds for keyboards (delay before first repeat rate) and infinity for
+	joysticks and mice.
+		- USB HID 1.11 Specification, p. 53
+*/
+u16 USB_IdleTimeoutDuration = 500;
+u16 USB_IdleTimeoutRemaining = 0;
 
 local void HID_sendReport() {
 	static union {
@@ -139,55 +26,78 @@ local void HID_sendReport() {
 		USB_bootKeyboardReport_t boot;
 		USB_nkroKeyboardReport_t nkro;
 	} report = { 0 };
+	u8 reportSize;
 
-	if (usingReportProtocol) {
+	if (USB_UsingReportProtocol) {
 		populateNkroKeyboardReport(&report.nkro);
+		reportSize = sizeof(report.nkro);
 	} else {
 		populateBootKeyboardReport(&report.boot);
+		reportSize = sizeof(report.boot);
 	}
 
 	bool shouldSend;
-	if (idleTimeoutDuration && !idleTimeoutRemaining) {
-		idleTimeoutRemaining = idleTimeoutDuration;
+	if (USB_IdleTimeoutDuration && !USB_IdleTimeoutRemaining) {
+		USB_IdleTimeoutRemaining = USB_IdleTimeoutDuration;
 		shouldSend = true;
 	} else {
 		shouldSend = memcmp(&previousReport, &report, sizeof(report)) != 0;
 	}
 
-	Endpoint_SelectEndpoint(KEYBOARD_IN_EPADDR);
-	if (Endpoint_IsReadWriteAllowed() && shouldSend) {
-		memcpy(&previousReport, &report, sizeof(report));
-
-		Endpoint_Write_Stream_LE(
-			&report,
-			usingReportProtocol ? sizeof(report.nkro) : sizeof(report.boot),
-			NULL);
-
-		Endpoint_ClearIN();
-	}
-}
-
-local void HID_receiveReport(void)
-{
-	Endpoint_SelectEndpoint(KEYBOARD_OUT_EPADDR);
-	if (!Endpoint_IsOUTReceived()) {
+	if (!shouldSend) {
 		return;
 	}
 
-	if (Endpoint_IsReadWriteAllowed()) {
-		USB_ledReport_t report = Endpoint_Read_8();
-		processLEDReport(report);
+	USB_selectEndpoint(USB_ENDPOINT_KEYBOARD_IN);
+	if (!USB_isINReady()) {
+		return;
 	}
+	if (!USB_transferData(&report, reportSize, false, USB_ENDPOINT_KEYBOARD_SIZE)) return;
 
-	Endpoint_ClearOUT();
+	memcpy(&previousReport, &report, sizeof(report));
+}
+
+local void HID_receiveReport(void) {
+	USB_selectEndpoint(USB_ENDPOINT_KEYBOARD_OUT);
+	if (!USB_isOUTReady()) {
+		return;
+	}
+	USB_ledReport_t report = USB_readByteFromEndpoint();
+	USB_sendOUT();
+
+	processLEDReport(report);
 }
 
 void USB_init() {
-	USB_Init();
+	/*
+		Power On the USB interface
+			- Power-On USB pads regulator
+			- Configure PLL interface
+			- Enable PLL
+			- Check PLL lock
+			- Enable USB interface
+			- Configure USB interface (USB speed, Endpoints configuration...)
+			- Wait for USB VBUS information connection
+			- Attach USB device
+
+			- ATmega32U4 datasheet, section 21.12 USB Software Operating Modes, p. 266
+	*/
+
+	UHWCON = _BV(UVREGE);
+	USBCON = _BV(USBE) | _BV(FRZCLK);
+	PLLFRQ = _BV(PLLUSB) | _BV(PDIV3) | _BV(PDIV1);
+	USB_enablePLL();
+	USBCON = (USBCON & ~_BV(FRZCLK)) | _BV(OTGPADE) | _BV(VBUSTE);
+	UDCON = 0; // Attach, enable full speed mode
+	UDIEN = _BV(SUSPE) | _BV(EORSTE);
+
+	USB_configureEndpoint(USB_ENDPOINT_CONTROL,
+		USB_CFG0X_ENDPOINT_TYPE_CONTROL | USB_CFG0X_ENDPOINT_DIRECTION_OUT,
+		USB_CFG1X_ENDPOINT_SIZE(USB_ENDPOINT_CONTROL_SIZE));
 }
 
 void USB_update() {
-	if (USB_DeviceState != DEVICE_STATE_Configured) {
+	if (USB_DEVICE_STATE != USB_DeviceState_Configured) {
 		return;
 	}
 	HID_sendReport();

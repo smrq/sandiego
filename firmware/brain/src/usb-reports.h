@@ -1,6 +1,7 @@
 #pragma once
 
 #include "defs.h"
+#include "usb.h"
 #include "usb-descriptors.h"
 
 typedef struct {

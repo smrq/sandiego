@@ -1,263 +1,213 @@
-#include <LUFA/Drivers/USB/USB.h>
 #include "defs.h"
-#include "usb-descriptors.h"
+#include "usb.h"
 
 typedef struct {
-	USB_Descriptor_Configuration_Header_t Config;
+	USB_ConfigurationDescriptor_t configuration;
+	USB_InterfaceDescriptor_t     interface;
+	HID_Descriptor_t              hid;
+	USB_EndpointDescriptor_t      keyboardInEndpoint;
+	USB_EndpointDescriptor_t      keyboardOutEndpoint;
+} USB_CombinedConfigurationDescriptor_t;
 
-	// Keyboard HID Interface
-	USB_Descriptor_Interface_t HID_Interface;
-	USB_HID_Descriptor_HID_t   HID_KeyboardHID;
-	USB_Descriptor_Endpoint_t  HID_ReportINEndpoint;
-	USB_Descriptor_Endpoint_t  HID_ReportOUTEndpoint;
-} USB_Descriptor_Configuration_t;
-
-enum InterfaceDescriptors_t {
-	INTERFACE_ID_Keyboard = 0
+enum StringDescriptorId_t {
+	StringDescriptorId_Language     = 0,
+	StringDescriptorId_Manufacturer = 1,
+	StringDescriptorId_Product      = 2
 };
 
-enum StringDescriptors_t {
-	STRING_ID_Language     = 0,
-	STRING_ID_Manufacturer = 1,
-	STRING_ID_Product      = 2
+/*
+	Note that the key report is split into several similar items, because:
+
+	An item field cannot span more than 4 bytes in a report. For example, a 32-bit
+	item must start on a byte boundary to satisfy this condition.
+		- USB HID 1.11 Specification, p. 57
+*/
+const u8 PROGMEM NkroKeyboardReportDescriptor[] = {
+	HID_USAGE_PAGE      (8, HID_USAGE_PAGE_GENERIC_DESKTOP_CONTROLS),
+	HID_USAGE           (8, HID_DESKTOP_KEYBOARD),
+	HID_COLLECTION      (8, HID_COLLECTION_APPLICATION),
+
+	HID_USAGE_PAGE      (8, HID_USAGE_PAGE_KEYBOARD_KEYPAD),
+	HID_LOGICAL_MINIMUM (8, 0x00),
+	HID_LOGICAL_MAXIMUM (8, 0x01),
+	HID_REPORT_SIZE     (8, 0x01),
+	HID_REPORT_COUNT    (8, 0x20),
+	HID_USAGE_MINIMUM   (8, 0x00),
+	HID_USAGE_MAXIMUM   (8, 0x1F),
+	HID_INPUT           (8, HID_DATA | HID_VARIABLE | HID_ABSOLUTE),
+
+	HID_USAGE_MINIMUM   (8, 0x20),
+	HID_USAGE_MAXIMUM   (8, 0x3F),
+	HID_INPUT           (8, HID_DATA | HID_VARIABLE | HID_ABSOLUTE),
+
+	HID_USAGE_MINIMUM   (8, 0x40),
+	HID_USAGE_MAXIMUM   (8, 0x5F),
+	HID_INPUT           (8, HID_DATA | HID_VARIABLE | HID_ABSOLUTE),
+
+	HID_USAGE_MINIMUM   (8, 0x60),
+	HID_USAGE_MAXIMUM   (8, 0x7F),
+	HID_INPUT           (8, HID_DATA | HID_VARIABLE | HID_ABSOLUTE),
+
+	HID_USAGE_MINIMUM   (8, 0x80),
+	HID_USAGE_MAXIMUM   (8, 0x9F),
+	HID_INPUT           (8, HID_DATA | HID_VARIABLE | HID_ABSOLUTE),
+
+	HID_USAGE_MINIMUM   (8, 0xA0),
+	HID_USAGE_MAXIMUM   (8, 0xBF),
+	HID_INPUT           (8, HID_DATA | HID_VARIABLE | HID_ABSOLUTE),
+
+	HID_USAGE_MINIMUM   (8, 0xC0),
+	HID_USAGE_MAXIMUM   (8, 0xDF),
+	HID_INPUT           (8, HID_DATA | HID_VARIABLE | HID_ABSOLUTE),
+
+	HID_USAGE_MINIMUM   (8, 0xE0),
+	HID_USAGE_MAXIMUM   (8, 0xFF),
+	HID_INPUT           (8, HID_DATA | HID_VARIABLE | HID_ABSOLUTE),
+
+	HID_USAGE_PAGE      (8, HID_USAGE_PAGE_LEDS),
+	HID_USAGE_MINIMUM   (8, 0x01),
+	HID_USAGE_MAXIMUM   (8, 0x05),
+	HID_REPORT_SIZE     (8, 0x01),
+	HID_REPORT_COUNT    (8, 0x05),
+	HID_OUTPUT          (8, HID_DATA | HID_VARIABLE | HID_ABSOLUTE),
+
+	HID_REPORT_SIZE     (8, 0x03),
+	HID_REPORT_COUNT    (8, 0x01),
+	HID_OUTPUT          (8, HID_CONSTANT),
+
+	HID_END_COLLECTION  (0)
 };
 
-const USB_Descriptor_HIDReport_Datatype_t PROGMEM BootKeyboardReportDescriptor[] = {
-	HID_RI_USAGE_PAGE(8, 0x01), /* Generic Desktop */
-	HID_RI_USAGE(8, 0x06), /* Keyboard */
-	HID_RI_COLLECTION(8, 0x01), /* Application */
-
-		HID_RI_USAGE_PAGE(8, 0x07), /* Key Codes */
-		HID_RI_USAGE_MINIMUM(8, 0xE0), /* Keyboard Left Control */
-		HID_RI_USAGE_MAXIMUM(8, 0xE7), /* Keyboard Right GUI */
-		HID_RI_LOGICAL_MINIMUM(8, 0x00),
-		HID_RI_LOGICAL_MAXIMUM(8, 0x01),
-		HID_RI_REPORT_SIZE(8, 0x01),
-		HID_RI_REPORT_COUNT(8, 0x08),
-		HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
-
-		HID_RI_REPORT_COUNT(8, 0x01),
-		HID_RI_REPORT_SIZE(8, 0x08),
-		HID_RI_INPUT(8, HID_IOF_CONSTANT),
-
-		HID_RI_USAGE_PAGE(8, 0x08), /* LEDs */
-		HID_RI_USAGE_MINIMUM(8, 0x01), /* Num Lock */
-		HID_RI_USAGE_MAXIMUM(8, 0x05), /* Kana */
-		HID_RI_REPORT_COUNT(8, 0x05),
-		HID_RI_REPORT_SIZE(8, 0x01),
-		HID_RI_OUTPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE | HID_IOF_NON_VOLATILE),
-
-		HID_RI_REPORT_COUNT(8, 0x01),
-		HID_RI_REPORT_SIZE(8, 0x03),
-		HID_RI_OUTPUT(8, HID_IOF_CONSTANT),
-
-		HID_RI_LOGICAL_MINIMUM(8, 0x00),
-		HID_RI_LOGICAL_MAXIMUM(8, 0x65),
-		HID_RI_USAGE_PAGE(8, 0x07), /* Keyboard */
-		HID_RI_USAGE_MINIMUM(8, 0x00), /* Reserved (no event indicated) */
-		HID_RI_USAGE_MAXIMUM(8, 0x65), /* Keyboard Application */
-		HID_RI_REPORT_COUNT(8, 0x06),
-		HID_RI_REPORT_SIZE(8, 0x08),
-		HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_ARRAY | HID_IOF_ABSOLUTE),
-	HID_RI_END_COLLECTION(0)
+const USB_DeviceDescriptor_t PROGMEM DeviceDescriptor = {
+	.header = {
+		.length         = sizeof(USB_DeviceDescriptor_t),
+		.descriptorType = USB_DescriptorType_Device,
+	},
+	.usbVersion         = BCD(1,1,0),
+	.deviceClass        = USB_Class_FromInterface,
+	.deviceSubClass     = USB_Subclass_FromInterface,
+	.deviceProtocol     = USB_Protocol_FromInterface,
+	.maxPacketSize      = USB_ENDPOINT_CONTROL_SIZE,
+	.vendorId           = USB_VENDOR_ID,
+	.productId          = USB_PRODUCT_ID,
+	.deviceVersion      = USB_RELEASE_NUMBER,
+	.manufacturerString = StringDescriptorId_Manufacturer,
+	.productString      = StringDescriptorId_Product,
+	.serialNumberString = USB_NO_STRING_DESCRIPTOR,
+	.numConfigurations  = USB_CONFIGURATION_COUNT
 };
 
-const USB_Descriptor_HIDReport_Datatype_t PROGMEM NKROKeyboardReportDescriptor[] = {
-	HID_RI_USAGE_PAGE(8, 0x01), /* Generic Desktop */
-	HID_RI_USAGE(8, 0x06), /* Keyboard */
-	HID_RI_COLLECTION(8, 0x01), /* Application */
-		HID_RI_USAGE_PAGE(8, 0x07), /* Key Codes */
-		HID_RI_LOGICAL_MINIMUM(8, 0x00),
-		HID_RI_LOGICAL_MAXIMUM(8, 0x01),
-		HID_RI_REPORT_SIZE(8, 0x01),
-		HID_RI_REPORT_COUNT(8, 0x20),
-			HID_RI_USAGE_MINIMUM(8, 0x00),
-			HID_RI_USAGE_MAXIMUM(8, 0x1F),
-			HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
-			HID_RI_USAGE_MINIMUM(8, 0x20),
-			HID_RI_USAGE_MAXIMUM(8, 0x3F),
-			HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
-			HID_RI_USAGE_MINIMUM(8, 0x40),
-			HID_RI_USAGE_MAXIMUM(8, 0x5F),
-			HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
-			HID_RI_USAGE_MINIMUM(8, 0x60),
-			HID_RI_USAGE_MAXIMUM(8, 0x7F),
-			HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
-			HID_RI_USAGE_MINIMUM(8, 0x80),
-			HID_RI_USAGE_MAXIMUM(8, 0x9F),
-			HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
-			HID_RI_USAGE_MINIMUM(8, 0xA0),
-			HID_RI_USAGE_MAXIMUM(8, 0xBF),
-			HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
-			HID_RI_USAGE_MINIMUM(8, 0xC0),
-			HID_RI_USAGE_MAXIMUM(8, 0xDF),
-			HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
-			HID_RI_USAGE_MINIMUM(8, 0xE0),
-			HID_RI_USAGE_MAXIMUM(8, 0xFF),
-			HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
-		HID_RI_USAGE_PAGE(8, 0x08), /* LEDs */
-		HID_RI_USAGE_MINIMUM(8, 0x01), /* Num Lock */
-		HID_RI_USAGE_MAXIMUM(8, 0x05), /* Kana */
-		HID_RI_REPORT_COUNT(8, 0x05),
-		HID_RI_REPORT_SIZE(8, 0x01),
-		HID_RI_OUTPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE | HID_IOF_NON_VOLATILE),
-		HID_RI_REPORT_COUNT(8, 0x01),
-		HID_RI_REPORT_SIZE(8, 0x03),
-		HID_RI_OUTPUT(8, HID_IOF_CONSTANT),
-	HID_RI_END_COLLECTION(0)
-};
-
-const USB_Descriptor_Device_t PROGMEM DeviceDescriptor = {
-	.Header = {
-		.Size = sizeof(USB_Descriptor_Device_t),
-		.Type = DTYPE_Device
+const USB_CombinedConfigurationDescriptor_t PROGMEM ConfigurationDescriptor = {
+	.configuration = {
+		.header = {
+			.length          = sizeof(USB_ConfigurationDescriptor_t),
+			.descriptorType  = USB_DescriptorType_Configuration
+		},
+		.totalLength         = sizeof(USB_CombinedConfigurationDescriptor_t),
+		.numInterfaces       = USB_INTERFACE_COUNT,
+		.configurationValue  = USB_CONFIGURATION_KEYBOARD,
+		.configurationString = USB_NO_STRING_DESCRIPTOR,
+		.attributes          = (USB_CONFIGURATION_ATTRIBUTES_RESERVED | USB_CONFIGURATION_ATTRIBUTES_SELF_POWERED),
+		.maxPower            = USB_MAX_POWER_mA(100) // I *definitely* promise not to use more than 100mA... per LED^H^H^H^H^H^H^H
 	},
 
-	.USBSpecification       = VERSION_BCD(1,1,0),
-	.Class                  = USB_CSCP_NoDeviceClass,
-	.SubClass               = USB_CSCP_NoDeviceSubclass,
-	.Protocol               = USB_CSCP_NoDeviceProtocol,
-
-	.Endpoint0Size          = FIXED_CONTROL_ENDPOINT_SIZE,
-
-	.VendorID               = VENDOR_ID,
-	.ProductID              = PRODUCT_ID,
-	.ReleaseNumber          = RELEASE_NUMBER,
-
-	.ManufacturerStrIndex   = STRING_ID_Manufacturer,
-	.ProductStrIndex        = STRING_ID_Product,
-	.SerialNumStrIndex      = NO_DESCRIPTOR,
-
-	.NumberOfConfigurations = FIXED_NUM_CONFIGURATIONS
-};
-
-const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor = {
-	.Config = {
-		.Header = {
-			.Size = sizeof(USB_Descriptor_Configuration_Header_t),
-			.Type = DTYPE_Configuration
+	.interface = {
+		.header = {
+			.length         = sizeof(USB_InterfaceDescriptor_t),
+			.descriptorType = USB_DescriptorType_Interface
 		},
-
-		.TotalConfigurationSize = sizeof(USB_Descriptor_Configuration_t),
-		.TotalInterfaces        = 1,
-
-		.ConfigurationNumber    = 1,
-		.ConfigurationStrIndex  = NO_DESCRIPTOR,
-
-		.ConfigAttributes       = (USB_CONFIG_ATTR_RESERVED | USB_CONFIG_ATTR_SELFPOWERED),
-
-		// I *definitely* promise not to use more than 100mA... per LED^H^H^H^H^H^H^H
-		// I think this same lie is in every single USB-based Arduino project.
-		.MaxPowerConsumption    = USB_CONFIG_POWER_MA(100)
+		.interfaceNumber    = USB_INTERFACE_KEYBOARD,
+		.alternateSetting   = 0,
+		.numEndpoints       = USB_ENDPOINT_COUNT,
+		.interfaceClass     = USB_Class_HID,
+		.interfaceSubClass  = HID_Subclass_Boot,
+		.interfaceProtocol  = HID_Protocol_Keyboard,
+		.interfaceString    = USB_NO_STRING_DESCRIPTOR
 	},
 
-	.HID_Interface = {
-		.Header = {
-			.Size = sizeof(USB_Descriptor_Interface_t),
-			.Type = DTYPE_Interface
+	.hid = {
+		.header = {
+			.length         = sizeof(HID_Descriptor_t),
+			.descriptorType = HID_DescriptorType_HID,
 		},
-
-		.InterfaceNumber        = INTERFACE_ID_Keyboard,
-		.AlternateSetting       = 0x00,
-
-		.TotalEndpoints         = 2,
-
-		.Class                  = HID_CSCP_HIDClass,
-		.SubClass               = HID_CSCP_BootSubclass,
-		.Protocol               = HID_CSCP_KeyboardBootProtocol,
-
-		.InterfaceStrIndex      = NO_DESCRIPTOR
+		.hidVersion         = BCD(1,1,1),
+		.countryCode        = HID_CountryCode_NotSupported,
+		.numDescriptors     = 1,
+		.descriptorType     = HID_DescriptorType_Report,
+		.descriptorLength   = sizeof(NkroKeyboardReportDescriptor)
 	},
 
-	.HID_KeyboardHID = {
-		.Header = {
-			.Size = sizeof(USB_HID_Descriptor_HID_t),
-			.Type = HID_DTYPE_HID
+	.keyboardInEndpoint = {
+		.header = {
+			.length         = sizeof(USB_EndpointDescriptor_t),
+			.descriptorType = USB_DescriptorType_Endpoint
 		},
-
-		.HIDSpec                = VERSION_BCD(1,1,1),
-		.CountryCode            = 0x00,
-		.TotalReportDescriptors = 1,
-		.HIDReportType          = HID_DTYPE_Report,
-		.HIDReportLength        = sizeof(NKROKeyboardReportDescriptor)
+		.endpointAddress    = USB_ENDPOINT_KEYBOARD_IN | USB_ENDPOINT_ADDRESS_DIRECTION_IN,
+		.attributes         = USB_ENDPOINT_ATTRIBUTES_INTERRUPT, // TODO: see newer spec for ENDPOINT_ATTR_NO_SYNC and ENDPOINT_USAGE_DATA??
+		.maxPacketSize      = USB_ENDPOINT_KEYBOARD_SIZE,
+		.interval           = 5
 	},
 
-	.HID_ReportINEndpoint = {
-		.Header = {
-			.Size = sizeof(USB_Descriptor_Endpoint_t),
-			.Type = DTYPE_Endpoint
+	.keyboardOutEndpoint = {
+		.header = {
+			.length         = sizeof(USB_EndpointDescriptor_t),
+			.descriptorType = USB_DescriptorType_Endpoint
 		},
-
-		.EndpointAddress        = KEYBOARD_IN_EPADDR,
-		.Attributes             = (EP_TYPE_INTERRUPT | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
-		.EndpointSize           = KEYBOARD_EPSIZE,
-		.PollingIntervalMS      = 0x05
-	},
-
-	.HID_ReportOUTEndpoint = {
-		.Header = {
-			.Size = sizeof(USB_Descriptor_Endpoint_t),
-			.Type = DTYPE_Endpoint
-		},
-
-		.EndpointAddress        = KEYBOARD_OUT_EPADDR,
-		.Attributes             = (EP_TYPE_INTERRUPT | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
-		.EndpointSize           = KEYBOARD_EPSIZE,
-		.PollingIntervalMS      = 0x05
+		.endpointAddress    = USB_ENDPOINT_KEYBOARD_OUT | USB_ENDPOINT_ADDRESS_DIRECTION_OUT,
+		.attributes         = USB_ENDPOINT_ATTRIBUTES_INTERRUPT, // TODO same
+		.maxPacketSize      = USB_ENDPOINT_KEYBOARD_SIZE,
+		.interval           = 5
 	}
 };
 
-const USB_Descriptor_String_t PROGMEM LanguageString = USB_STRING_DESCRIPTOR_ARRAY(LANGUAGE_ID_ENG);
-const USB_Descriptor_String_t PROGMEM ManufacturerString = USB_STRING_DESCRIPTOR(L"smrq");
-const USB_Descriptor_String_t PROGMEM ProductString = USB_STRING_DESCRIPTOR(L"Sandiego Keyboard");
+const USB_LanguageDescriptor_t      PROGMEM LanguageDescriptor     = USB_LANGUAGE_DESCRIPTOR(USB_LANGUAGE_ID_ENGLISH_US);
+const USB_UnicodeStringDescriptor_t PROGMEM ManufacturerDescriptor = USB_UNICODE_STRING_DESCRIPTOR(L"smrq");
+const USB_UnicodeStringDescriptor_t PROGMEM ProductDescriptor      = USB_UNICODE_STRING_DESCRIPTOR(L"Sandiego Keyboard");
 
-u16 CALLBACK_USB_GetDescriptor(const u16 wValue, UNUSED const u16 wIndex, const void** const descriptorAddress) {
-	const u8 descriptorType = (wValue >> 8) & 0xFF;
-	const u8 descriptorNumber = (wValue >> 0) & 0xFF;
+bool USB_getDescriptor(u8 type, u8 number, const void **address, u16 *size) {
+	switch (type) {
+		case USB_DescriptorType_Device:
+			*address = &DeviceDescriptor;
+			*size = sizeof(DeviceDescriptor);
+			return true;
 
-	const void *address = NULL;
-	u16 size = NO_DESCRIPTOR;
+		case USB_DescriptorType_Configuration:
+			*address = &ConfigurationDescriptor;
+			*size = sizeof(ConfigurationDescriptor);
+			return true;
 
-	switch (descriptorType) {
-		case DTYPE_Device:
-			address = &DeviceDescriptor;
-			size = sizeof(USB_Descriptor_Device_t);
-			break;
+		case USB_DescriptorType_String:
+			switch (number) {
+				case StringDescriptorId_Language:
+					*address = &LanguageDescriptor;
+					*size = sizeof(LanguageDescriptor);
+					return true;
 
-		case DTYPE_Configuration:
-			address = &ConfigurationDescriptor;
-			size = sizeof(USB_Descriptor_Configuration_t);
-			break;
+				case StringDescriptorId_Manufacturer:
+					*address = &ManufacturerDescriptor;
+					*size = sizeof(ManufacturerDescriptor);
+					return true;
 
-		case DTYPE_String:
-			switch (descriptorNumber) {
-				case STRING_ID_Language:
-					address = &LanguageString;
-					size = pgm_read_byte(&LanguageString.Header.Size);
-					break;
-				case STRING_ID_Manufacturer:
-					address = &ManufacturerString;
-					size = pgm_read_byte(&ManufacturerString.Header.Size);
-					break;
-				case STRING_ID_Product:
-					address = &ProductString;
-					size = pgm_read_byte(&ProductString.Header.Size);
-					break;
+				case StringDescriptorId_Product:
+					*address = &ProductDescriptor;
+					*size = sizeof(ProductDescriptor);
+					return true;
+
+				default:
+					return false;
 			}
 
-			break;
+		case HID_DescriptorType_HID:
+			*address = &ConfigurationDescriptor.hid;
+			*size = sizeof(ConfigurationDescriptor.hid);
+			return true;
 
-		case HID_DTYPE_HID:
-			address = &ConfigurationDescriptor.HID_KeyboardHID;
-			size = sizeof(USB_HID_Descriptor_HID_t);
-			break;
+		case HID_DescriptorType_Report:
+			*address = &NkroKeyboardReportDescriptor;
+			*size = sizeof(NkroKeyboardReportDescriptor);
+			return true;
 
-		case HID_DTYPE_Report:
-			address = &NKROKeyboardReportDescriptor;
-			size = sizeof(NKROKeyboardReportDescriptor);
-			break;
+		default:
+			return false;
 	}
-
-	*descriptorAddress = address;
-	return size;
 }
