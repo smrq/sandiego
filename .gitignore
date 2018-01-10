@@ -1,7 +1,11 @@
 # Build directories
 bin
+build
 dep
 obj
+
+# Generated files
+*.generated.scad
 
 # Temporary KiCad files
 # https://en.wikibooks.org/wiki/Kicad/file_formats
