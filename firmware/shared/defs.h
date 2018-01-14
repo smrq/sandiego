@@ -40,10 +40,10 @@ typedef int32_t i32;
 #define TWI_CMD_SET_LEDS 0x10
 #define TWI_CMD_GET_KEY_STATE 0x20
 
-#define LED_COUNT 10
-
-#define ROW_COUNT 5
-#define COL_COUNT 7
+#define ROW_COUNT   5
+#define COL_COUNT   7
+#define LAYER_COUNT 2
+#define LED_COUNT   10
 
 #define GCC_MEMORY_BARRIER()       __asm__ __volatile__("" ::: "memory");
 #define GCC_IS_COMPILE_CONST(x)    __builtin_constant_p(x)
@@ -63,6 +63,3 @@ typedef int32_t i32;
 	SREG = __sreg; \
 	GCC_MEMORY_BARRIER(); \
 } while(0)
-
-#define CONCAT(x, y)            x ## y
-#define CONCAT_EXPANDED(x, y)   CONCAT(x, y)

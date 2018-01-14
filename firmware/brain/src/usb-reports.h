@@ -16,6 +16,6 @@ typedef struct {
 
 typedef u8 USB_ledReport_t;
 
-void populateBootKeyboardReport(USB_bootKeyboardReport_t *report);
-void populateNkroKeyboardReport(USB_nkroKeyboardReport_t *report);
+bool populateBootKeyboardReport(USB_bootKeyboardReport_t *report);
+bool populateNkroKeyboardReport(USB_nkroKeyboardReport_t *report);
 void processLEDReport(USB_ledReport_t report);

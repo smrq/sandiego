@@ -76,7 +76,7 @@ local bool USB_handleGetConfiguration() {
 	USB_sendIN();
 
 	if (!USB_waitForOUTReady()) return false;
-	USB_sendOUT();
+	USB_clearOUT();
 
 	return true;
 }
@@ -151,7 +151,7 @@ local bool USB_handleGetDescriptor(u16 value, u8 length) {
 	}
 
 	if (!USB_waitForOUTReady()) return false;
-	USB_sendOUT();
+	USB_clearOUT();
 
 	return true;
 }
@@ -271,7 +271,7 @@ local bool USB_handleGetDeviceStatus() {
 	USB_sendIN();
 
 	if (!USB_waitForOUTReady()) return false;
-	USB_sendOUT();
+	USB_clearOUT();
 
 	return true;
 }
@@ -294,7 +294,7 @@ local bool USB_handleGetEndpointStatus(u8 index) {
 	USB_sendIN();
 
 	if (!USB_waitForOUTReady()) return false;
-	USB_sendOUT();
+	USB_clearOUT();
 
 	return true;
 }
@@ -322,7 +322,7 @@ local bool USB_handleGetReport(u8 length) {
 	USB_transferData(&report, reportSize, false, USB_ENDPOINT_CONTROL_SIZE);
 
 	if (!USB_waitForOUTReady()) return false;
-	USB_sendOUT();
+	USB_clearOUT();
 
 	return true;
 }
@@ -332,7 +332,7 @@ local bool USB_handleSetReport() {
 	if (!USB_waitForOUTReady()) return false;
 
 	USB_ledReport_t report = USB_readByteFromEndpoint();
-	USB_sendOUT();
+	USB_clearOUT();
 
 	if (!USB_waitForINReady()) return false;
 	USB_sendIN();
@@ -349,7 +349,7 @@ local bool USB_handleGetIdle() {
 	USB_sendIN();
 
 	if (!USB_waitForOUTReady()) return false;
-	USB_sendOUT();
+	USB_clearOUT();
 
 	return true;
 }
@@ -371,7 +371,7 @@ local bool USB_handleGetProtocol() {
 	USB_sendIN();
 
 	if (!USB_waitForOUTReady()) return false;
-	USB_sendOUT();
+	USB_clearOUT();
 
 	return true;
 }
@@ -517,7 +517,7 @@ ISR(USB_COM_vect, ISR_BLOCK) {
 
 	USB_DeviceRequest_t controlRequest;
 	USB_readFromEndpoint(&controlRequest, sizeof(controlRequest));
-	UEINTX &= ~_BV(RXSTPI);
+	USB_clearSETUP();
 	USB_handleControlRequest(&controlRequest);
 
 	USB_selectEndpoint(USB_ENDPOINT_CONTROL);

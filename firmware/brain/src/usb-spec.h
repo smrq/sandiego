@@ -354,15 +354,15 @@ enum {
 #define HID_KEYBOARD_6_CARET               0x23
 #define HID_KEYBOARD_7_AMPERSAND           0x24
 #define HID_KEYBOARD_8_ASTERISK            0x25
-#define HID_KEYBOARD_9_LEFT_PAREN          0x26
-#define HID_KEYBOARD_0_RIGHT_PAREN         0x27
+#define HID_KEYBOARD_9_LPAREN              0x26
+#define HID_KEYBOARD_0_RPAREN              0x27
 #define HID_KEYBOARD_ENTER                 0x28
 #define HID_KEYBOARD_ESCAPE                0x29
 #define HID_KEYBOARD_BACKSPACE             0x2A
 #define HID_KEYBOARD_TAB                   0x2B
-#define HID_KEYBOARD_SPACEBAR              0x2C
+#define HID_KEYBOARD_SPACE                 0x2C
 #define HID_KEYBOARD_DASH_UNDERSCORE       0x2D
-#define HID_KEYBOARD_EQUALS_PLUS           0x2E
+#define HID_KEYBOARD_EQUAL_PLUS            0x2E
 #define HID_KEYBOARD_LBRACKET_LBRACE       0x2F
 #define HID_KEYBOARD_RBRACKET_RBRACE       0x30
 #define HID_KEYBOARD_BACKSLASH_PIPE        0x31
@@ -419,7 +419,7 @@ enum {
 #define HID_KEYBOARD_NON_US_BACKSLASH_PIPE 0x64
 #define HID_KEYBOARD_APPLICATION           0x65
 #define HID_KEYBOARD_POWER                 0x66
-#define HID_KEYPAD_EQUALS                  0x67
+#define HID_KEYPAD_EQUAL                   0x67
 #define HID_KEYBOARD_F13                   0x68
 #define HID_KEYBOARD_F14                   0x69
 #define HID_KEYBOARD_F15                   0x6A
@@ -450,7 +450,7 @@ enum {
 #define HID_KEYBOARD_LOCKING_NUM_LOCK      0x83
 #define HID_KEYBOARD_LOCKING_SCROLL_LOCK   0x84
 #define HID_KEYPAD_COMMA                   0x85
-#define HID_KEYPAD_EQUALS_AS400            0x86
+#define HID_KEYPAD_EQUAL_AS400             0x86
 #define HID_KEYBOARD_INTERNATIONAL1        0x87
 #define HID_KEYBOARD_INTERNATIONAL2        0x88
 #define HID_KEYBOARD_INTERNATIONAL3        0x89

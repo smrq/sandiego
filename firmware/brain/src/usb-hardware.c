@@ -137,7 +137,7 @@ bool USB_waitForOUTReady() {
 	return true;
 }
 
-void USB_sendOUT() {
+void USB_clearOUT() {
 	UEINTX &= ~(_BV(RXOUTI) | _BV(FIFOCON));
 }
 

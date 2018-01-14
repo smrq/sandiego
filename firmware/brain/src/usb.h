@@ -29,10 +29,6 @@
 #define USB_ENDPOINT_KEYBOARD_OUT  2
 #define USB_ENDPOINT_KEYBOARD_SIZE 32
 
-#define ENDPOINT_DIR_MASK                 0x80
-#define ENDPOINT_DIR_OUT                  0x00
-#define ENDPOINT_DIR_IN                   0x80
-
 #define USB_VENDOR_ID              0xF055
 #define USB_PRODUCT_ID             0x2042
 #define USB_RELEASE_NUMBER         BCD(2,0,0)

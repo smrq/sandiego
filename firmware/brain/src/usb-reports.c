@@ -1,79 +1,78 @@
 #include "defs.h"
 #include "debug.h"
 #include "keys.h"
+#include "keymap.h"
 #include "usb.h"
 
-void populateBootKeyboardReport(USB_bootKeyboardReport_t *report) {
-	// TODO: set up real keyboard matrix
-	if (leftKeys.front[0]) {
-		report->modifiers = HID_KEYBOARD_LEFT_SHIFT;
+local USB_nkroKeyboardReport_t previousReport;
+
+bool populateBootKeyboardReport(USB_bootKeyboardReport_t *report) {
+	USB_nkroKeyboardReport_t nkroReport = { 0 };
+	bool hasUpdated = populateNkroKeyboardReport(&nkroReport);
+
+	// Modifiers are 0xE0-0xE7, so they take up exactly one page of the NKRO report. Thanks, HID spec!
+	report->modifiers = nkroReport.keys[0xE0 / 8];
+
+	for (u8 keyCodeIndex = 0, page = 0; page < 32 && keyCodeIndex < 6; ++page) {
+		// Skip modifier key page
+		if (page == 0xE0 / 8) {
+			continue;
+		}
+
+		if (nkroReport.keys[page]) {
+			for (u8 pageIndex = 0; pageIndex < 8 && keyCodeIndex < 6; ++pageIndex) {
+				if (nkroReport.keys[page] & _BV(pageIndex)) {
+					report->keyCodes[keyCodeIndex++] = (page * 8) + pageIndex;
+				}
+			}
+		}
 	}
 
-	u8 keyCodeIndex = 0;
-	if (leftKeys.front[1]) {
-		report->keyCodes[keyCodeIndex++] = HID_KEYBOARD_LEFT_ARROW;
-	}
-	if (leftKeys.front[2]) {
-		report->keyCodes[keyCodeIndex++] = HID_KEYBOARD_RIGHT_ARROW;
-	}
-	if (leftKeys.front[3]) {
-		report->keyCodes[keyCodeIndex++] = HID_KEYBOARD_A;
-	}
-	if (leftKeys.front[4]) {
-		report->keyCodes[keyCodeIndex++] = HID_KEYBOARD_B;
-	}
+	return hasUpdated;
 }
 
 local void setNkroKey(USB_nkroKeyboardReport_t *report, u8 key) {
 	report->keys[key / 8] |= _BV(key % 8);
 }
 
-void populateNkroKeyboardReport(USB_nkroKeyboardReport_t *report) {
-	// TODO: set up real keyboard matrix
-	if (leftKeys.front[0]) {
-		setNkroKey(report, HID_KEYBOARD_LEFT_SHIFT);
+local u8 determineKeymapLayer() {
+	u8 layer = 0;
+	for (u8 row = 0; row < ROW_COUNT; ++row) {
+		if (leftKeys.front[row] || rightKeys.front[row]) {
+			for (u8 col = 0; col < COL_COUNT; ++col) {
+				if (leftKeys.front[row] & _BV(col)) {
+					u16 mapping = pgm_read_word(&keymap.layers[layer].left[row][col]);
+					if (mapping & KEYMAP_LAYER_SHIFT) {
+						layer = mapping & KEYMAP_CODE_MASK;
+					}
+				}
+				if (rightKeys.front[row] & _BV(col)) {
+					u16 mapping = pgm_read_word(&keymap.layers[layer].right[row][col]);
+					if (mapping & KEYMAP_LAYER_SHIFT) {
+						layer = mapping & KEYMAP_CODE_MASK;
+					}
+				}
+			}
+		}
 	}
-	if (leftKeys.front[1]) {
-		setNkroKey(report, HID_KEYBOARD_A);
-		setNkroKey(report, HID_KEYBOARD_B);
-		setNkroKey(report, HID_KEYBOARD_C);
-		setNkroKey(report, HID_KEYBOARD_D);
-		setNkroKey(report, HID_KEYBOARD_E);
-		setNkroKey(report, HID_KEYBOARD_F);
-		setNkroKey(report, HID_KEYBOARD_G);
-		setNkroKey(report, HID_KEYBOARD_H);
-		setNkroKey(report, HID_KEYBOARD_I);
-		setNkroKey(report, HID_KEYBOARD_J);
-		setNkroKey(report, HID_KEYBOARD_K);
-		setNkroKey(report, HID_KEYBOARD_L);
-		setNkroKey(report, HID_KEYBOARD_M);
-		setNkroKey(report, HID_KEYBOARD_N);
-		setNkroKey(report, HID_KEYBOARD_O);
-		setNkroKey(report, HID_KEYBOARD_P);
-		setNkroKey(report, HID_KEYBOARD_Q);
-		setNkroKey(report, HID_KEYBOARD_R);
-		setNkroKey(report, HID_KEYBOARD_S);
-		setNkroKey(report, HID_KEYBOARD_T);
-		setNkroKey(report, HID_KEYBOARD_U);
-		setNkroKey(report, HID_KEYBOARD_V);
-		setNkroKey(report, HID_KEYBOARD_W);
-		setNkroKey(report, HID_KEYBOARD_X);
-		setNkroKey(report, HID_KEYBOARD_Y);
-		setNkroKey(report, HID_KEYBOARD_Z);
-	}
-	if (leftKeys.front[2]) {
-		setNkroKey(report, HID_KEYBOARD_B);
-	}
-	if (leftKeys.front[3]) {
-		setNkroKey(report, HID_KEYBOARD_C);
-	}
-	if (leftKeys.front[4]) {
-		setNkroKey(report, HID_KEYBOARD_D);
-	}
+	return layer;
 }
 
-void processLEDReport(USB_ledReport_t LEDReport)
-{
+bool populateNkroKeyboardReport(USB_nkroKeyboardReport_t *report) {
+	u8 layer = determineKeymapLayer();
+
+	if (leftKeys.front[0]) setNkroKey(report, HID_KEYBOARD_A);
+	if (leftKeys.front[1]) setNkroKey(report, HID_KEYBOARD_B);
+	if (leftKeys.front[2]) setNkroKey(report, HID_KEYBOARD_C);
+	if (leftKeys.front[3]) setNkroKey(report, HID_KEYBOARD_D);
+	if (leftKeys.front[4]) setNkroKey(report, HID_KEYBOARD_E);
+
+	bool hasUpdated = memcmp(&previousReport, report, sizeof(previousReport)) != 0;
+	memcpy(&previousReport, report, sizeof(previousReport));
+	return hasUpdated;
+}
+
+void processLEDReport(USB_ledReport_t LEDReport) {
 	u8 value = _BV(1);
 
 	if (LEDReport & HID_LED_NUM_LOCK) {

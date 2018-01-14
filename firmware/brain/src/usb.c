@@ -17,31 +17,24 @@ u16 USB_IdleTimeoutDuration = 500;
 u16 USB_IdleTimeoutRemaining = 0;
 
 local void HID_sendReport() {
-	static union {
-		USB_bootKeyboardReport_t boot;
-		USB_nkroKeyboardReport_t nkro;
-	} previousReport = { 0 };
-
 	union {
 		USB_bootKeyboardReport_t boot;
 		USB_nkroKeyboardReport_t nkro;
 	} report = { 0 };
 	u8 reportSize;
+	bool shouldSend;
 
 	if (USB_UsingReportProtocol) {
-		populateNkroKeyboardReport(&report.nkro);
+		shouldSend = populateNkroKeyboardReport(&report.nkro);
 		reportSize = sizeof(report.nkro);
 	} else {
-		populateBootKeyboardReport(&report.boot);
+		shouldSend = populateBootKeyboardReport(&report.boot);
 		reportSize = sizeof(report.boot);
 	}
 
-	bool shouldSend;
 	if (USB_IdleTimeoutDuration && !USB_IdleTimeoutRemaining) {
 		USB_IdleTimeoutRemaining = USB_IdleTimeoutDuration;
 		shouldSend = true;
-	} else {
-		shouldSend = memcmp(&previousReport, &report, sizeof(report)) != 0;
 	}
 
 	if (!shouldSend) {
@@ -49,12 +42,7 @@ local void HID_sendReport() {
 	}
 
 	USB_selectEndpoint(USB_ENDPOINT_KEYBOARD_IN);
-	if (!USB_isINReady()) {
-		return;
-	}
-	if (!USB_transferData(&report, reportSize, false, USB_ENDPOINT_KEYBOARD_SIZE)) return;
-
-	memcpy(&previousReport, &report, sizeof(report));
+	USB_transferData(&report, reportSize, false, USB_ENDPOINT_KEYBOARD_SIZE);
 }
 
 local void HID_receiveReport(void) {
@@ -63,7 +51,7 @@ local void HID_receiveReport(void) {
 		return;
 	}
 	USB_ledReport_t report = USB_readByteFromEndpoint();
-	USB_sendOUT();
+	USB_clearOUT();
 
 	processLEDReport(report);
 }

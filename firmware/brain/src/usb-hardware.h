@@ -52,7 +52,7 @@ bool USB_waitForINReady();
 void USB_sendIN();
 bool USB_isOUTReady();
 bool USB_waitForOUTReady();
-void USB_sendOUT();
+void USB_clearOUT();
 bool USB_isSETUPReady();
 void USB_clearSETUP();
 bool USB_transferData(const void *buffer, u8 length, bool fromPROGMEM, u8 endpointSize);

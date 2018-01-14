@@ -143,7 +143,7 @@ const USB_CombinedConfigurationDescriptor_t PROGMEM ConfigurationDescriptor = {
 			.descriptorType = USB_DescriptorType_Endpoint
 		},
 		.endpointAddress    = USB_ENDPOINT_KEYBOARD_IN | USB_ENDPOINT_ADDRESS_DIRECTION_IN,
-		.attributes         = USB_ENDPOINT_ATTRIBUTES_INTERRUPT, // TODO: see newer spec for ENDPOINT_ATTR_NO_SYNC and ENDPOINT_USAGE_DATA??
+		.attributes         = USB_ENDPOINT_ATTRIBUTES_INTERRUPT,
 		.maxPacketSize      = USB_ENDPOINT_KEYBOARD_SIZE,
 		.interval           = 5
 	},
@@ -154,7 +154,7 @@ const USB_CombinedConfigurationDescriptor_t PROGMEM ConfigurationDescriptor = {
 			.descriptorType = USB_DescriptorType_Endpoint
 		},
 		.endpointAddress    = USB_ENDPOINT_KEYBOARD_OUT | USB_ENDPOINT_ADDRESS_DIRECTION_OUT,
-		.attributes         = USB_ENDPOINT_ATTRIBUTES_INTERRUPT, // TODO same
+		.attributes         = USB_ENDPOINT_ATTRIBUTES_INTERRUPT,
 		.maxPacketSize      = USB_ENDPOINT_KEYBOARD_SIZE,
 		.interval           = 5
 	}
