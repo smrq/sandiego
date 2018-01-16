@@ -41,3 +41,5 @@ extern u16 USB_IdleTimeoutRemaining;
 
 void USB_init();
 void USB_update();
+
+void USB_debugSendString(char *str, u8 length);

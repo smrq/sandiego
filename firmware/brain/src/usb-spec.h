@@ -527,14 +527,14 @@ enum {
 #define HID_KEYPAD_OCTAL                   0xDB
 #define HID_KEYPAD_DECIMAL                 0xDC
 #define HID_KEYPAD_HEXADECIMAL             0xDD
-#define HID_KEYBOARD_LEFT_CONTROL          0xE0
-#define HID_KEYBOARD_LEFT_SHIFT            0xE1
-#define HID_KEYBOARD_LEFT_ALT              0xE2
-#define HID_KEYBOARD_LEFT_GUI              0xE3
-#define HID_KEYBOARD_RIGHT_CONTROL         0xE4
-#define HID_KEYBOARD_RIGHT_SHIFT           0xE5
-#define HID_KEYBOARD_RIGHT_ALT             0xE6
-#define HID_KEYBOARD_RIGHT_GUI             0xE7
+#define HID_KEYBOARD_LCONTROL              0xE0
+#define HID_KEYBOARD_LSHIFT                0xE1
+#define HID_KEYBOARD_LALT                  0xE2
+#define HID_KEYBOARD_LGUI                  0xE3
+#define HID_KEYBOARD_RCONTROL              0xE4
+#define HID_KEYBOARD_RSHIFT                0xE5
+#define HID_KEYBOARD_RALT                  0xE6
+#define HID_KEYBOARD_RGUI                  0xE7
 
 /* USB HID Usage Tables 1.12, Section 11 LED Page (0x08), p. 61 */
 #define HID_LED_NUM_LOCK    0x01

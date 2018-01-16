@@ -2,6 +2,7 @@
 #include "debug.h"
 #include "leds.h"
 #include "keys.h"
+#include "tft.h"
 #include "twi.h"
 #include "usb.h"
 
@@ -20,16 +21,21 @@ void setup() {
 	DDRB = _BV(4) | _BV(5) | _BV(6) | _BV(7);
 
 	// Port C
-	// 6-7: Unused (floating)
+	// 6:   TFT C/D (output, normally high)
+	// 7:   TFT CS (output, normally high)
 	PORTC = _BV(6) | _BV(7);
-	DDRC = 0;
+	DDRC = _BV(6) | _BV(7);
 
 	// Port D
 	// 0:   SCL (ignored when TWEN bit in TWCR is set; external pull-up)
 	// 1:   SDA (ignored when TWEN bit in TWCR is set; external pull-up)
-	// 2-6: Unused (floating)
-	PORTD = ~(_BV(0) | _BV(1));
-	DDRD = 0;
+	// 2:   TFT RD (output, normally high)
+	// 3:   TFT WR (output, normally high)
+	// 4:   Unused (floating)
+	// 5:   TFT Reset (output)
+	// 6-7: TFT D6-7 (output)
+	PORTD = _BV(2) | _BV(3) | _BV(4);
+	DDRD = _BV(2) | _BV(3) | _BV(5) | _BV(6) | _BV(7);
 
 	// Port E
 	// 2,6: Unused (floating)
@@ -37,14 +43,22 @@ void setup() {
 	DDRE = 0;
 
 	// Port F
-	// 0-1: Unused (floating)
-	// 4-7: Unused (floating)
-	PORTF = ~(_BV(2) | _BV(3));
-	DDRF = 0;
+	// 0-1: TFT D0-1 (output)
+	// 4-7: TFT D2-5 (output)
+	PORTF = 0;
+	DDRF = _BV(0) | _BV(1) | _BV(4) | _BV(5) | _BV(6) | _BV(7);
 
 	TWI_init();
+	TFT_init();
 	USB_init();
 	enableGlobalInterrupts();
+
+	// u32 tftid = TFT_readId();
+	// while (USB_DEVICE_STATE != USB_DeviceState_Configured);
+	// _delay_ms(10);
+	// char str[16] = { 0 };
+	// snprintf(str, sizeof(str), "0x%lx  ", tftid);
+	// USB_debugSendString(str, sizeof(str));
 }
 
 void updateLeds(led_buffer_t *leds, key_buffer_t *keys) {
@@ -69,6 +83,8 @@ void updateLeds(led_buffer_t *leds, key_buffer_t *keys) {
 	}
 }
 
+const u16 colors[4] = { 0x0000, 0x07E0, 0xF800, 0x001F };
+
 void loop() {
 	requestKeys(TWI_ADDRESS_LEFT, &leftKeys);
 	requestKeys(TWI_ADDRESS_RIGHT, &rightKeys);
@@ -79,6 +95,10 @@ void loop() {
 
 	transmitLeds(TWI_ADDRESS_LEFT, &leftLeds);
 	transmitLeds(TWI_ADDRESS_RIGHT, &rightLeds);
+
+	static u8 colorIndex = 0;
+	TFT_fillScreen(colors[colorIndex++]);
+	if (colorIndex >= 4) { colorIndex = 0; }
 }
 
 int main() {

@@ -91,3 +91,60 @@ void USB_update() {
 	HID_sendReport();
 	HID_receiveReport();
 }
+
+//-----------------------------
+
+local void setNkroKey(USB_nkroKeyboardReport_t *report, u8 key) {
+	if (key) {
+		report->keys[key / 8] |= _BV(key % 8);
+	}
+}
+
+local void setNkroChar(USB_nkroKeyboardReport_t *report, u8 c) {
+	if (c >= 'a' && c <= 'z') {
+		setNkroKey(report, HID_KEYBOARD_A + (c - 'a'));
+	}
+	if (c >= 'A' && c <= 'Z') {
+		setNkroKey(report, HID_KEYBOARD_A + (c - 'a'));
+		setNkroKey(report, HID_KEYBOARD_LSHIFT);
+	}
+	if (c == '0') {
+		setNkroKey(report, HID_KEYBOARD_0_RPAREN);
+	}
+	if (c >= '1' && c <= '9') {
+		setNkroKey(report, HID_KEYBOARD_1_BANG + (c - '1'));
+	}
+	if (c == ' ') {
+		setNkroKey(report, HID_KEYBOARD_SPACE);
+	}
+	if (c == '\n') {
+		setNkroKey(report, HID_KEYBOARD_ENTER);
+	}
+}
+
+void USB_debugSendString(char *str, u8 length) {
+	USB_selectEndpoint(USB_ENDPOINT_KEYBOARD_IN);
+
+	USB_nkroKeyboardReport_t lastReport = { 0 };
+	USB_transferData(&lastReport, sizeof(lastReport), false, USB_ENDPOINT_KEYBOARD_SIZE);
+
+	while (length) {
+		USB_nkroKeyboardReport_t report = { 0 };
+		setNkroChar(&report, str[0]);
+
+		if (memcmp(&report, &lastReport, sizeof(report)) == 0) {
+			memset(&lastReport, 0, sizeof(lastReport));
+			USB_transferData(&lastReport, sizeof(lastReport), false, USB_ENDPOINT_KEYBOARD_SIZE);
+		}
+
+		USB_transferData(&report, sizeof(report), false, USB_ENDPOINT_KEYBOARD_SIZE);
+
+		memcpy(&lastReport, &report, sizeof(lastReport));
+
+		++str;
+		--length;
+	}
+
+	memset(&lastReport, 0, sizeof(lastReport));
+	USB_transferData(&lastReport, sizeof(lastReport), false, USB_ENDPOINT_KEYBOARD_SIZE);
+}

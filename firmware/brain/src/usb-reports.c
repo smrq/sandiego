@@ -58,6 +58,16 @@ local u8 determineKeymapLayer() {
 	return layer;
 }
 
+void setNkroKeyForHexValue(USB_nkroKeyboardReport_t *report, u8 value) {
+	if (value == 0x0) {
+		setNkroKey(report, HID_KEYPAD_0_INSERT);
+	} else if (value < 0xA) {
+		setNkroKey(report, HID_KEYPAD_1_END + (value - 0x1));
+	} else {
+		setNkroKey(report, HID_KEYBOARD_A + (value - 0xA));
+	}
+}
+
 bool populateNkroKeyboardReport(USB_nkroKeyboardReport_t *report) {
 	u8 layer = determineKeymapLayer();
 
