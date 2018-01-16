@@ -1,8 +1,10 @@
 #include "defs.h"
 #include "tft.h"
+#include "tft_font.h"
 
-#define TFTWIDTH   240
-#define TFTHEIGHT  320
+local i16 TFT_Width;
+local i16 TFT_Height;
+local u8 TFT_Rotation;
 
 local void TFT_setActive()   { PORTF &= ~_BV(7); }
 local void TFT_clearActive() { PORTF |=  _BV(7); }
@@ -12,6 +14,7 @@ local void TFT_setWrite()    { PORTF &= ~_BV(5); }
 local void TFT_clearWrite()  { PORTF |=  _BV(5); }
 local void TFT_setRead()     { PORTF &= ~_BV(4); }
 local void TFT_clearRead()   { PORTF |=  _BV(4); }
+
 local void TFT_resend() {
 	TFT_setWrite();
 	TFT_clearWrite();
@@ -105,74 +108,54 @@ local u32 TFT_read32() {
 }
 
 local void TFT_setAddr(u16 x0, u16 y0, u16 x1, u16 y1) {
-	TFT_writeCommand(ILI9341_COLADDRSET);
+	TFT_writeCommand(ILI9341_COLUMN_ADDRESS_SET);
 	TFT_write16(x0);
 	TFT_write16(x1);
-	TFT_writeCommand(ILI9341_PAGEADDRSET);
+	TFT_writeCommand(ILI9341_PAGE_ADDRESS_SET);
 	TFT_write16(y0);
 	TFT_write16(y1);
 }
 
-static const uint8_t init_commands[] = {
-	4, 0xEF, 0x03, 0x80, 0x02,
-	4, 0xCF, 0x00, 0XC1, 0X30,
-	5, 0xED, 0x64, 0x03, 0X12, 0X81,
-	4, 0xE8, 0x85, 0x00, 0x78,
-	6, 0xCB, 0x39, 0x2C, 0x00, 0x34, 0x02,
-	2, 0xF7, 0x20,
-	3, 0xEA, 0x00, 0x00,
-	2, ILI9341_POWERCONTROL1, 0x23, // Power control
-	2, ILI9341_POWERCONTROL2, 0x10, // Power control
-	3, ILI9341_VCOMCONTROL1, 0x3e, 0x28, // VCM control
-	2, ILI9341_VCOMCONTROL2, 0x86, // VCM control2
-	2, ILI9341_MEMCONTROL, 0x48, // Memory Access Control
-	2, ILI9341_PIXELFORMAT, 0x55,
-	3, ILI9341_FRAMECONTROL, 0x00, 0x18,
-	4, 0xB6, 0x08, 0x82, 0x27, // Display Function Control
-	2, 0xF2, 0x00, // Gamma Function Disable
-	2, 0x26, 0x01, // Gamma curve selected
-	16, 0xE0, 0x0F, 0x31, 0x2B, 0x0C, 0x0E, 0x08,
-		0x4E, 0xF1, 0x37, 0x07, 0x10, 0x03, 0x0E, 0x09, 0x00, // Set Gamma
-	16, 0xE1, 0x00, 0x0E, 0x14, 0x03, 0x11, 0x07,
-		0x31, 0xC1, 0x48, 0x08, 0x0F, 0x0C, 0x31, 0x36, 0x0F, // Set Gamma
-	3, 0xb1, 0x00, 0x10, // FrameRate Control 119Hz
-	1, ILI9341_SLEEPOUT,
-	0
-};
-
 void TFT_init() {
+	TFT_Width = TFT_HEIGHT;
+	TFT_Height = TFT_WIDTH;
+	TFT_Rotation = ILI9341_MAC_ROTATION_90;
+
     /*
     	It is necessary to wait 5msec after releasing RESX before sending commands.
     		- ILI9341 datasheet v1.02, section 15.4. Reset Timing, p. 218
     */
     _delay_ms(5);
 
-    const u8 *cmd = init_commands;
+	/* https://github.com/adafruit/TFTLCD-Library/blob/d73bbf18/Adafruit_TFTLCD.cpp#L279 */
 	TFT_setActive();
-	while (1) {
-		if (!(*cmd)) {
-			break;
-		}
-		u8 len = *cmd++;
-		TFT_writeCommand(*cmd++);
-		for (u8 i = 0; i < (len - 1); ++i) {
-			TFT_write8(*cmd++);
-		}
-	}
+	TFT_writeCommand(ILI9341_POWER_CONTROL_1);
+	TFT_write8(0x23); // 4.60V (default is 4.50V)
+	TFT_writeCommand(ILI9341_POWER_CONTROL_2);
+	TFT_write8(0x10); // Default
+	TFT_writeCommand(ILI9341_VCOM_CONTROL_1);
+	TFT_write16(0x2B2B); // 3.775V | -1.425V
+	TFT_writeCommand(ILI9341_VCOM_CONTROL_2);
+	TFT_write8(0x0C); // ~nVM | VMH – 52 | VML – 52
+	TFT_writeCommand(ILI9341_MEMORY_ACCESS_CONTROL);
+	TFT_write8(ILI9341_MAC_BGR | TFT_Rotation);
+	TFT_writeCommand(ILI9341_PIXEL_FORMAT_SET);
+	TFT_write8(ILI9341_PIXEL_FORMAT_RGB_16BPP | ILI9341_PIXEL_FORMAT_MCU_16BPP);
+	TFT_writeCommand(ILI9341_FRAME_CONTROL_NORMAL_MODE);
+	TFT_write16(0x001B); // fosc | 70 Hz (default)
+	TFT_writeCommand(ILI9341_SLEEP_OUT);
 	TFT_clearActive();
 
 	_delay_ms(150);
 
 	TFT_setActive();
-	TFT_writeCommand(ILI9341_DISPLAYON);
+	TFT_writeCommand(ILI9341_DISPLAY_ON);
 	TFT_clearActive();
-
-	TFT_enableBacklight();
 }
 
 u32 TFT_readId() {
 	TFT_setActive();
-	TFT_writeCommand(0xD3);
+	TFT_writeCommand(ILI9341_READ_ID4);
 	TFT_setReadDirection();
 	TFT_read8();
 	u32 result = TFT_read24();
@@ -181,26 +164,205 @@ u32 TFT_readId() {
 	return result;
 }
 
+void TFT_setScroll(u16 offset) {
+	TFT_setActive();
+	TFT_writeCommand(ILI9341_VERTICAL_SCROLLING_START_ADDRESS);
+	TFT_write16(offset);
+	TFT_clearActive();
+}
 
 void TFT_fillRect(i16 x, i16 y, i16 w, i16 h, u16 color) {
-	if((x >= TFTWIDTH) || (y >= TFTHEIGHT)) return;
-	if(x < 0) {	w += x; x = 0; }
-	if(y < 0) {	h += y; y = 0; }
-	if((x + w - 1) >= TFTWIDTH)  w = TFTWIDTH  - x;
-	if((y + h - 1) >= TFTHEIGHT) h = TFTHEIGHT - y;
+	if ((x >= TFT_Width) || (y >= TFT_Height)) return;
+	if (x < 0) { w += x; x = 0; }
+	if (y < 0) { h += y; y = 0; }
+	if ((x + w - 1) >= TFT_Width)  { w = TFT_Width  - x; }
+	if ((y + h - 1) >= TFT_Height) { h = TFT_Height - y; }
 
 	TFT_setActive();
 	TFT_setAddr(x, y, x+w-1, y+h-1);
-	TFT_writeCommand(ILI9341_MEMORYWRITE);
-	for(y=h; y>0; y--) {
-		for(x=w; x>0; x--) {
-			TFT_write8((color >> 8) & 0xFF);
-			TFT_write8((color >> 0) & 0xFF);
+	TFT_writeCommand(ILI9341_MEMORY_WRITE);
+
+	u8 colorHigh = (color >> 8) & 0xFF;
+	u8 colorLow  = (color >> 0) & 0xFF;
+
+	if (colorHigh == colorLow) {
+		TFT_write8(colorLow);
+		TFT_resend();
+		for (x = 0; x < w - 1; ++x) {
+			TFT_resend();
+			TFT_resend();
 		}
+		for (y = 0; y < h - 1; ++y) {
+			for (x = 0; x < w; ++x) {
+				TFT_resend();
+				TFT_resend();
+			}
+		}
+	} else {
+		for (y = 0; y < h; ++y) {
+			for (x = 0; x < w; ++x) {
+				TFT_write8(colorHigh);
+				TFT_write8(colorLow);
+			}
+		}
+	}
+
+	TFT_clearActive();
+}
+
+void TFT_drawPixel(i16 x, i16 y, u16 color) {
+	if ((x < 0) || (x >= TFT_Width) || (y < 0) || (y >= TFT_Height)) return;
+
+	TFT_setActive();
+	TFT_setAddr(x, y, x, y);
+	TFT_writeCommand(ILI9341_MEMORY_WRITE);
+	TFT_write16(color);
+	TFT_clearActive();
+}
+
+void TFT_drawFastVLine(i16 x, i16 y, i16 h, u16 color) {
+	if ((x >= TFT_Width) || (x < 0) || (y >= TFT_Height)) return;
+	if (y < 0) { h += y; y = 0; }
+	if ((y + h - 1) >= TFT_Height) { h = TFT_Height - y; }
+
+	TFT_setActive();
+	TFT_setAddr(x, y, x, y + h - 1);
+	TFT_writeCommand(ILI9341_MEMORY_WRITE);
+	while (h-- > 0) {
+		TFT_write16(color);
 	}
 	TFT_clearActive();
 }
 
-void TFT_fillScreen(uint16_t color) {
-	TFT_fillRect(0, 0, TFTWIDTH, TFTHEIGHT, color);
+void TFT_drawFastHLine(i16 x, i16 y, i16 w, u16 color) {
+	if ((x >= TFT_Width) || (y >= TFT_Height) || (y < 0)) return;
+	if (x < 0) { w += x; x = 0; }
+	if ((x + w - 1) >= TFT_Width) { w = TFT_Width - x; }
+
+	TFT_setActive();
+	TFT_setAddr(x, y, x + w - 1, y);
+	TFT_writeCommand(ILI9341_MEMORY_WRITE);
+	while (w-- > 0) {
+		TFT_write16(color);
+	}
+	TFT_clearActive();
 }
+
+void TFT_fillScreen(u16 color) {
+	TFT_fillRect(0, 0, TFT_Width, TFT_Height, color);
+}
+
+void TFT_drawCharacter(i16 x, i16 y, u8 c, u16 fgcolor, u16 bgcolor, u8 size) {
+	if ((x >= TFT_Width) ||
+		(y >= TFT_Height) ||
+		((x + (6 * size) - 1) < 0) ||
+		((y + (8 * size) - 1) < 0)) {
+		return;
+	}
+
+	if (fgcolor == bgcolor) {
+		// This transparent approach is only about 20% faster
+		if (size == 1) {
+			uint8_t mask = 0x01;
+			i16 xoff, yoff;
+			for (yoff=0; yoff < 8; yoff++) {
+				uint8_t line = 0;
+				for (xoff=0; xoff < 5; xoff++) {
+					if (pgm_read_byte(&glcdfont[c * 5 + xoff]) & mask) line |= 1;
+					line <<= 1;
+				}
+				line >>= 1;
+				xoff = 0;
+				while (line) {
+					if (line == 0x1F) {
+						TFT_drawFastHLine(x + xoff, y + yoff, 5, fgcolor);
+						break;
+					} else if (line == 0x1E) {
+						TFT_drawFastHLine(x + xoff, y + yoff, 4, fgcolor);
+						break;
+					} else if ((line & 0x1C) == 0x1C) {
+						TFT_drawFastHLine(x + xoff, y + yoff, 3, fgcolor);
+						line <<= 4;
+						xoff += 4;
+					} else if ((line & 0x18) == 0x18) {
+						TFT_drawFastHLine(x + xoff, y + yoff, 2, fgcolor);
+						line <<= 3;
+						xoff += 3;
+					} else if ((line & 0x10) == 0x10) {
+						TFT_drawPixel(x + xoff, y + yoff, fgcolor);
+						line <<= 2;
+						xoff += 2;
+					} else {
+						line <<= 1;
+						xoff += 1;
+					}
+				}
+				mask = mask << 1;
+			}
+		} else {
+			uint8_t mask = 0x01;
+			i16 xoff, yoff;
+			for (yoff=0; yoff < 8; yoff++) {
+				uint8_t line = 0;
+				for (xoff=0; xoff < 5; xoff++) {
+					if (pgm_read_byte(&glcdfont[c * 5 + xoff]) & mask) line |= 1;
+					line <<= 1;
+				}
+				line >>= 1;
+				xoff = 0;
+				while (line) {
+					if (line == 0x1F) {
+						TFT_fillRect(x + xoff * size, y + yoff * size, 5 * size, size, fgcolor);
+						break;
+					} else if (line == 0x1E) {
+						TFT_fillRect(x + xoff * size, y + yoff * size, 4 * size, size, fgcolor);
+						break;
+					} else if ((line & 0x1C) == 0x1C) {
+						TFT_fillRect(x + xoff * size, y + yoff * size, 3 * size, size, fgcolor);
+						line <<= 4;
+						xoff += 4;
+					} else if ((line & 0x18) == 0x18) {
+						TFT_fillRect(x + xoff * size, y + yoff * size, 2 * size, size, fgcolor);
+						line <<= 3;
+						xoff += 3;
+					} else if ((line & 0x10) == 0x10) {
+						TFT_fillRect(x + xoff * size, y + yoff * size, size, size, fgcolor);
+						line <<= 2;
+						xoff += 2;
+					} else {
+						line <<= 1;
+						xoff += 1;
+					}
+				}
+				mask = mask << 1;
+			}
+		}
+	} else {
+		TFT_setActive();
+		TFT_setAddr(x, y, x + 6 * size - 1, y + 8 * size - 1);
+		TFT_writeCommand(ILI9341_MEMORY_WRITE);
+		uint8_t xr, yr;
+		uint8_t mask = 0x01;
+		u16 color;
+		for (y=0; y < 8; y++) {
+			for (yr=0; yr < size; yr++) {
+				for (x=0; x < 5; x++) {
+					if (pgm_read_byte(&glcdfont[c * 5 + x]) & mask) {
+						color = fgcolor;
+					} else {
+						color = bgcolor;
+					}
+					for (xr=0; xr < size; xr++) {
+						TFT_write16(color);
+					}
+				}
+				for (xr=0; xr < size; xr++) {
+					TFT_write16(bgcolor);
+				}
+			}
+			mask = mask << 1;
+		}
+		TFT_clearActive();
+	}
+}
+

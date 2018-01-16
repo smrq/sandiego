@@ -22,7 +22,7 @@ enum StringDescriptorId_t {
 	item must start on a byte boundary to satisfy this condition.
 		- USB HID 1.11 Specification, p. 57
 */
-const u8 PROGMEM NkroKeyboardReportDescriptor[] = {
+local const u8 PROGMEM NkroKeyboardReportDescriptor[] = {
 	HID_USAGE_PAGE      (8, HID_USAGE_PAGE_GENERIC_DESKTOP_CONTROLS),
 	HID_USAGE           (8, HID_DESKTOP_KEYBOARD),
 	HID_COLLECTION      (8, HID_COLLECTION_APPLICATION),
@@ -78,7 +78,7 @@ const u8 PROGMEM NkroKeyboardReportDescriptor[] = {
 	HID_END_COLLECTION  (0)
 };
 
-const USB_DeviceDescriptor_t PROGMEM DeviceDescriptor = {
+local const USB_DeviceDescriptor_t PROGMEM DeviceDescriptor = {
 	.header = {
 		.length         = sizeof(USB_DeviceDescriptor_t),
 		.descriptorType = USB_DescriptorType_Device,
@@ -97,7 +97,7 @@ const USB_DeviceDescriptor_t PROGMEM DeviceDescriptor = {
 	.numConfigurations  = USB_CONFIGURATION_COUNT
 };
 
-const USB_CombinedConfigurationDescriptor_t PROGMEM ConfigurationDescriptor = {
+local const USB_CombinedConfigurationDescriptor_t PROGMEM ConfigurationDescriptor = {
 	.configuration = {
 		.header = {
 			.length          = sizeof(USB_ConfigurationDescriptor_t),
@@ -160,9 +160,9 @@ const USB_CombinedConfigurationDescriptor_t PROGMEM ConfigurationDescriptor = {
 	}
 };
 
-const USB_LanguageDescriptor_t      PROGMEM LanguageDescriptor     = USB_LANGUAGE_DESCRIPTOR(USB_LANGUAGE_ID_ENGLISH_US);
-const USB_UnicodeStringDescriptor_t PROGMEM ManufacturerDescriptor = USB_UNICODE_STRING_DESCRIPTOR(L"smrq");
-const USB_UnicodeStringDescriptor_t PROGMEM ProductDescriptor      = USB_UNICODE_STRING_DESCRIPTOR(L"Sandiego Keyboard");
+local const USB_LanguageDescriptor_t      PROGMEM LanguageDescriptor     = USB_LANGUAGE_DESCRIPTOR(USB_LANGUAGE_ID_ENGLISH_US);
+local const USB_UnicodeStringDescriptor_t PROGMEM ManufacturerDescriptor = USB_UNICODE_STRING_DESCRIPTOR(L"smrq");
+local const USB_UnicodeStringDescriptor_t PROGMEM ProductDescriptor      = USB_UNICODE_STRING_DESCRIPTOR(L"Sandiego Keyboard");
 
 bool USB_getDescriptor(u8 type, u8 number, const void **address, u16 *size) {
 	switch (type) {

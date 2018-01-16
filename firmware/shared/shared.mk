@@ -22,6 +22,7 @@ AVRDUDEFLAGS+=-C $(SHAREDDIR)/avrdude.conf -p $(MCU) -c arduino -P $(PORT) -v
 
 COMPILE=$(CC) $(DEPFLAGS) $(CFLAGS) $(OPTFLAGS) $(ARCHFLAGS) -c
 COMPILEVENDOR=$(CC) $(CFLAGS) $(OPTFLAGS) $(ARCHFLAGS) -c
+COMPILEASM=$(CC) $(CFLAGS) -O2 $(ARCHFLAGS) -S
 LINK=$(CC) $(OPTFLAGS) $(ARCHFLAGS)
 AVRDUDE=avrdude $(AVRDUDEFLAGS)
 
@@ -43,6 +44,10 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c $(DEPDIR)/%.d
 	@mkdir -p $(@D)
 	$(COMPILE) $< -o $@
 	@mv -f $(DEPDIR)/$*.temp-d $(DEPDIR)/$*.d && touch $@
+
+$(OBJDIR)/%.S: $(SRCDIR)/%.c
+	@mkdir -p $(@D)
+	$(COMPILEASM) $< -o $@
 
 $(DEPDIR)/%.d: ;
 

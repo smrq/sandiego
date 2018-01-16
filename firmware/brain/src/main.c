@@ -56,6 +56,43 @@ void setup() {
 	// char str[16] = { 0 };
 	// snprintf(str, sizeof(str), "0x%lx  ", tftid);
 	// USB_debugSendString(str, sizeof(str));
+
+	#define COLOR_BLACK 0x0000
+	#define COLOR_RED   0xF800
+	#define COLOR_GREEN 0x07E0
+	#define COLOR_BLUE  0x001F
+
+	TFT_fillScreen(COLOR_BLACK);
+	TFT_fillRect(10, 10, 100, 100, COLOR_GREEN);
+	TFT_fillRect(30, 70, 160, 20, COLOR_RED);
+	TFT_fillRect(90, 40, 40, 120, COLOR_BLUE);
+
+	TFT_drawFastVLine(200, 50, 120, COLOR_GREEN);
+	TFT_drawFastHLine(60, 120, 240, COLOR_RED);
+
+	TFT_drawPixel(22, 22, COLOR_BLUE);
+	TFT_drawPixel(21, 21, COLOR_BLUE);
+	TFT_drawPixel(20, 20, COLOR_BLUE);
+	TFT_drawPixel(19, 19, COLOR_BLUE);
+	TFT_drawPixel(18, 18, COLOR_BLUE);
+	TFT_drawPixel(18, 22, COLOR_BLUE);
+	TFT_drawPixel(19, 21, COLOR_BLUE);
+	TFT_drawPixel(21, 19, COLOR_BLUE);
+	TFT_drawPixel(22, 18, COLOR_BLUE);
+
+	TFT_drawCharacter(25 + (2*6*0), 30 + (2*8*0), 'H', COLOR_BLACK, COLOR_GREEN, 2);
+	TFT_drawCharacter(25 + (2*6*1), 30 + (2*8*0), 'e', COLOR_BLACK, COLOR_GREEN, 2);
+	TFT_drawCharacter(25 + (2*6*2), 30 + (2*8*0), 'l', COLOR_BLACK, COLOR_GREEN, 2);
+	TFT_drawCharacter(25 + (2*6*3), 30 + (2*8*0), 'l', COLOR_BLACK, COLOR_GREEN, 2);
+	TFT_drawCharacter(25 + (2*6*4), 30 + (2*8*0), 'o', COLOR_BLACK, COLOR_GREEN, 2);
+
+	TFT_drawCharacter(25 + (2*6*0), 30 + (2*8*1), 'w', COLOR_BLACK, COLOR_GREEN, 2);
+	TFT_drawCharacter(25 + (2*6*1), 30 + (2*8*1), 'o', COLOR_BLACK, COLOR_GREEN, 2);
+	TFT_drawCharacter(25 + (2*6*2), 30 + (2*8*1), 'r', COLOR_BLACK, COLOR_GREEN, 2);
+	TFT_drawCharacter(25 + (2*6*3), 30 + (2*8*1), 'l', COLOR_BLACK, COLOR_GREEN, 2);
+	TFT_drawCharacter(25 + (2*6*4), 30 + (2*8*1), 'd', COLOR_BLACK, COLOR_GREEN, 2);
+
+	TFT_enableBacklight();
 }
 
 void updateLeds(led_buffer_t *leds, key_buffer_t *keys) {
@@ -80,8 +117,6 @@ void updateLeds(led_buffer_t *leds, key_buffer_t *keys) {
 	}
 }
 
-const u16 colors[4] = { 0x0000, 0x07E0, 0xF800, 0x001F };
-
 void loop() {
 	requestKeys(TWI_ADDRESS_LEFT, &leftKeys);
 	requestKeys(TWI_ADDRESS_RIGHT, &rightKeys);
@@ -92,10 +127,6 @@ void loop() {
 
 	transmitLeds(TWI_ADDRESS_LEFT, &leftLeds);
 	transmitLeds(TWI_ADDRESS_RIGHT, &rightLeds);
-
-	static u8 colorIndex = 0;
-	TFT_fillScreen(colors[colorIndex++]);
-	if (colorIndex >= 4) { colorIndex = 0; }
 }
 
 int main() {
