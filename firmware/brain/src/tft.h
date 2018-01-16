@@ -38,3 +38,5 @@ void TFT_reset();
 u32 TFT_readId();
 void TFT_begin();
 void TFT_fillScreen(uint16_t color);
+void TFT_enableBacklight();
+void TFT_disableBacklight();

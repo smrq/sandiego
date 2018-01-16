@@ -1,5 +1,4 @@
 #include "defs.h"
-#include "debug.h"
 #include "keys.h"
 #include "twi.h"
 

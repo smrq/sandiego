@@ -17,15 +17,16 @@
 
 #define PACKED __attribute__((__packed__))
 #define UNUSED __attribute__ ((unused))
+#define ALWAYS_INLINE __attribute__ ((always_inline))
 
-#define ATTR_ALIAS(func)           __attribute__ ((alias( #func )))
-#define ATTR_ALWAYS_INLINE         __attribute__ ((always_inline))
-#define ATTR_CONST                 __attribute__ ((const))
-#define ATTR_NON_NULL_PTR_ARG(...) __attribute__ ((nonnull (__VA_ARGS__)))
-#define ATTR_PACKED                __attribute__ ((packed))
-#define ATTR_UNUSED                __attribute__ ((unused))
-#define ATTR_WARN_UNUSED_RESULT    __attribute__ ((warn_unused_result))
-#define ATTR_WEAK                  __attribute__ ((weak))
+// #define ATTR_ALIAS(func)           __attribute__ ((alias( #func )))
+// #define ATTR_ALWAYS_INLINE         __attribute__ ((always_inline))
+// #define ATTR_CONST                 __attribute__ ((const))
+// #define ATTR_NON_NULL_PTR_ARG(...) __attribute__ ((nonnull (__VA_ARGS__)))
+// #define ATTR_PACKED                __attribute__ ((packed))
+// #define ATTR_UNUSED                __attribute__ ((unused))
+// #define ATTR_WARN_UNUSED_RESULT    __attribute__ ((warn_unused_result))
+// #define ATTR_WEAK                  __attribute__ ((weak))
 
 typedef uint8_t u8;
 typedef uint16_t u16;

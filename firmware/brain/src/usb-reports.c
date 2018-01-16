@@ -1,5 +1,4 @@
 #include "defs.h"
-#include "debug.h"
 #include "keys.h"
 #include "keymap.h"
 #include "usb.h"
@@ -97,5 +96,5 @@ void processLEDReport(USB_ledReport_t LEDReport) {
 		value |= _BV(3);
 	}
 
-	debug_output(value);
+	// debug_output(value);
 }

@@ -1,5 +1,4 @@
 #include "defs.h"
-#include "debug.h"
 #include "leds.h"
 #include "keys.h"
 #include "tft.h"
@@ -14,28 +13,22 @@ void setup() {
 	wdt_disable(); // This should be the default
 
 	// Port B
-	// 0:   SS (unused -- floating)
-	// 1-3: SCK, MOSI, MISO (floating -- connected only when programming with ISP)
-	// 4-7: Debug LED (output)
-	PORTB = _BV(0) | _BV(1) | _BV(2) | _BV(3) | _BV(4) | _BV(5) | _BV(6) | _BV(7);
-	DDRB = _BV(4) | _BV(5) | _BV(6) | _BV(7);
+	// 0-7: TFT D0-7 (normally output)
+	// [ISP 1-3: SCK, MOSI, MISO]
+	PORTB = 0;
+	DDRB = 0xFF;
 
 	// Port C
-	// 6:   TFT C/D (output, normally high)
-	// 7:   TFT CS (output, normally high)
+	// 6-7: Unused (floating)
 	PORTC = _BV(6) | _BV(7);
-	DDRC = _BV(6) | _BV(7);
+	DDRC = 0;
 
 	// Port D
 	// 0:   SCL (ignored when TWEN bit in TWCR is set; external pull-up)
 	// 1:   SDA (ignored when TWEN bit in TWCR is set; external pull-up)
-	// 2:   TFT RD (output, normally high)
-	// 3:   TFT WR (output, normally high)
-	// 4:   Unused (floating)
-	// 5:   TFT Reset (output)
-	// 6-7: TFT D6-7 (output)
-	PORTD = _BV(2) | _BV(3) | _BV(4);
-	DDRD = _BV(2) | _BV(3) | _BV(5) | _BV(6) | _BV(7);
+	// 2-7: Unused (floating)
+	PORTD = _BV(2) | _BV(3) | _BV(4) | _BV(5) | _BV(6) | _BV(7);
+	DDRD = 0;
 
 	// Port E
 	// 2,6: Unused (floating)
@@ -43,10 +36,14 @@ void setup() {
 	DDRE = 0;
 
 	// Port F
-	// 0-1: TFT D0-1 (output)
-	// 4-7: TFT D2-5 (output)
-	PORTF = 0;
-	DDRF = _BV(0) | _BV(1) | _BV(4) | _BV(5) | _BV(6) | _BV(7);
+	// 0:   Unused (floating)
+	// 1:   TFT Backlight (output)
+	// 4:   TFT RD (output, normally high)
+	// 5:   TFT WR (output, normally high)
+	// 6:   TFT C/D (output, normally high)
+	// 7:   TFT CS (output, normally high)
+	PORTF = _BV(0) | _BV(4) | _BV(5) | _BV(6) | _BV(7);
+	DDRF = _BV(1) | _BV(4) | _BV(5) | _BV(6) | _BV(7);
 
 	TWI_init();
 	TFT_init();
