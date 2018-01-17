@@ -1,6 +1,6 @@
 #include "defs.h"
-#include "keys.h"
-#include "twi.h"
+#include "./keys.h"
+#include "twi/twi.h"
 
 key_buffer_t leftKeys = { 0 };
 key_buffer_t rightKeys = { 0 };

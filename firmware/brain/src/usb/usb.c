@@ -1,6 +1,5 @@
 #include "defs.h"
-#include "keys.h"
-#include "usb.h"
+#include "./usb.h"
 
 u8 USB_ConfigurationNumber = 0;
 bool USB_RemoteWakeupEnabled = false;

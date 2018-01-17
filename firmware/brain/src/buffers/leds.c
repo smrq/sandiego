@@ -1,6 +1,6 @@
 #include "defs.h"
-#include "leds.h"
-#include "twi.h"
+#include "./leds.h"
+#include "twi/twi.h"
 
 led_buffer_t leftLeds = { 0 };
 led_buffer_t rightLeds = { 0 };

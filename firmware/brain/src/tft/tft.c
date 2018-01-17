@@ -1,6 +1,5 @@
 #include "defs.h"
-#include "tft.h"
-#include "tft_font.h"
+#include "./tft.h"
 
 local i16 TFT_Width;
 local i16 TFT_Height;
@@ -268,7 +267,7 @@ void TFT_drawCharacter(i16 x, i16 y, u8 c, u16 fgcolor, u16 bgcolor, u8 size) {
 			for (yoff=0; yoff < 8; yoff++) {
 				uint8_t line = 0;
 				for (xoff=0; xoff < 5; xoff++) {
-					if (pgm_read_byte(&glcdfont[c * 5 + xoff]) & mask) line |= 1;
+					if (pgm_read_byte(&TFT_font[c * 5 + xoff]) & mask) line |= 1;
 					line <<= 1;
 				}
 				line >>= 1;
@@ -305,7 +304,7 @@ void TFT_drawCharacter(i16 x, i16 y, u8 c, u16 fgcolor, u16 bgcolor, u8 size) {
 			for (yoff=0; yoff < 8; yoff++) {
 				uint8_t line = 0;
 				for (xoff=0; xoff < 5; xoff++) {
-					if (pgm_read_byte(&glcdfont[c * 5 + xoff]) & mask) line |= 1;
+					if (pgm_read_byte(&TFT_font[c * 5 + xoff]) & mask) line |= 1;
 					line <<= 1;
 				}
 				line >>= 1;
@@ -347,7 +346,7 @@ void TFT_drawCharacter(i16 x, i16 y, u8 c, u16 fgcolor, u16 bgcolor, u8 size) {
 		for (y=0; y < 8; y++) {
 			for (yr=0; yr < size; yr++) {
 				for (x=0; x < 5; x++) {
-					if (pgm_read_byte(&glcdfont[c * 5 + x]) & mask) {
+					if (pgm_read_byte(&TFT_font[c * 5 + x]) & mask) {
 						color = fgcolor;
 					} else {
 						color = bgcolor;

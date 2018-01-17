@@ -1,7 +1,7 @@
 #include "defs.h"
-#include "leds.h"
-#include "keys.h"
-#include "twi.h"
+#include "./twi.h"
+#include "buffers/leds.h"
+#include "buffers/keys.h"
 
 enum MessageState_t {
 	IDLE,

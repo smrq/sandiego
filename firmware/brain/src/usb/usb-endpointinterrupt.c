@@ -1,6 +1,5 @@
 #include "defs.h"
-#include "keys.h"
-#include "usb.h"
+#include "./usb.h"
 
 /*
 	Note for all control requests:

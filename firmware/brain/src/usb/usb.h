@@ -1,10 +1,10 @@
 #pragma once
 
 #include "defs.h"
-#include "usb-descriptors.h"
-#include "usb-hardware.h"
-#include "usb-reports.h"
-#include "usb-spec.h"
+#include "./usb-descriptors.h"
+#include "./usb-hardware.h"
+#include "./usb-reports.h"
+#include "./usb-spec.h"
 
 /*
 	A device can have more than one configuration, though only one at a time,

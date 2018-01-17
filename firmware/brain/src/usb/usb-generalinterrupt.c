@@ -1,5 +1,5 @@
 #include "defs.h"
-#include "usb.h"
+#include "./usb.h"
 
 local void USB_handleConnect() {
 	USB_enablePLL();

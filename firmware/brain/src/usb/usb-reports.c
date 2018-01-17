@@ -1,7 +1,7 @@
 #include "defs.h"
-#include "keys.h"
+#include "./usb.h"
 #include "keymap.h"
-#include "usb.h"
+#include "buffers/keys.h"
 
 local USB_nkroKeyboardReport_t previousReport;
 

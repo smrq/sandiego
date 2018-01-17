@@ -1,7 +1,7 @@
 #pragma once
 
-#include "usb.h"
 #include "defs.h"
+#include "usb/usb-spec.h"
 
 typedef struct {
 	u16 left[ROW_COUNT][COL_COUNT];

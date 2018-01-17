@@ -1,4 +1,5 @@
 #pragma once
+
 #include "defs.h"
 
 /* USB 1.1 Specification, section 9.1.1 Visible Device States, p. 175 */

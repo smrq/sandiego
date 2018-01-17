@@ -1,5 +1,7 @@
 #pragma once
 
+#include "defs.h"
+
 #define USB_DEVICE_STATE GPIOR0
 
 #if (F_CPU == 8000000)

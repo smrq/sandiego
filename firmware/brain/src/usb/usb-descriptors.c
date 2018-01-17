@@ -1,5 +1,5 @@
 #include "defs.h"
-#include "usb.h"
+#include "./usb.h"
 
 typedef struct {
 	USB_ConfigurationDescriptor_t configuration;

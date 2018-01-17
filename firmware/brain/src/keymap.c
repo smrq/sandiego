@@ -1,5 +1,5 @@
 #include "defs.h"
-#include "keymap.h"
+#include "./keymap.h"
 
 const keymap_t PROGMEM keymap = {
 	.layers = {

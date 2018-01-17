@@ -1,8 +1,8 @@
 #pragma once
 
 #include "defs.h"
-#include "leds.h"
-#include "keys.h"
+#include "buffers/leds.h"
+#include "buffers/keys.h"
 
 void TWI_init();
 bool TWI_busy();

@@ -1,9 +1,9 @@
 #include "defs.h"
-#include "leds.h"
-#include "keys.h"
-#include "tft.h"
-#include "twi.h"
-#include "usb.h"
+#include "buffers/leds.h"
+#include "buffers/keys.h"
+#include "tft/tft.h"
+#include "twi/twi.h"
+#include "usb/usb.h"
 
 void setup() {
 	// Set clock prescaler to 1 regardless of fuse bits

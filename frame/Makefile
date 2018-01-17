@@ -24,4 +24,4 @@ $(BUILDDIR)/%.svg: %.generated.scad $(MAIN)
 clean:
 	rm -rf *.generated.scad $(BUILDDIR)
 
-.PHONY: clean
+.PHONY: all clean
